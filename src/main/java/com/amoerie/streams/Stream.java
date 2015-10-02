@@ -9,7 +9,7 @@ import rx.functions.Func2;
  * Represents a collection of elements that are not known at construction time
  * This is a wrapper around the Iterator class, providing more functional methods than is standard provided by Java,
  * by combining some classic functional paradigms such as map and flatMap with the callback signatures that RxJava provides.
- * @param <E>
+ * @param <E> the type of each element in the stream
  */
 public abstract class Stream<E> implements Iterable<E> {
 
