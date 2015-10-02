@@ -129,6 +129,35 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Sorts this stream using the provided comparator. Note that this is a greedy operation, meaning that this will cause
+     * the stream to be materialized for it to be sorted.
+     * @param comparator the comparator to use as the basis for the sorting
+     * @return a new stream containing all elements of this stream in the order as specified by the comparator
+     */
+    public Stream<E> sort(Comparator<E> comparator) {
+        if(comparator == null) throw new IllegalArgumentException("comparator cannot be null");
+        List<E> list = toList();
+        Collections.sort(list, comparator);
+        return create(list);
+    }
+
+    /**
+     * Sorts this stream based on a property of each element, provided that that property implements Comparable.
+     * @param propertySelector the function that extracts a value from an element so it can be used as the basis for the comparison
+     * @param <T> the type of the property that is the basis for the comparison
+     * @return a new stream containing all elements of this stream sorted by the given property
+     */
+    public <T extends Comparable<T>> Stream<E> sortBy(final Func1<E, T> propertySelector) {
+        if(propertySelector == null) throw new IllegalArgumentException("property selector cannot be null!");
+        return sort(new Comparator<E>() {
+            @Override
+            public int compare(E left, E right) {
+                return propertySelector.call(left).compareTo(propertySelector.call(right));
+            }
+        });
+    }
+
+    /**
      * Turns this stream into a list
      * @return a new list containing all the elements of this stream
      */

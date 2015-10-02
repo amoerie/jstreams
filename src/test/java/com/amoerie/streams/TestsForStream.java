@@ -203,4 +203,21 @@ public class TestsForStream
             assertThat(fruitNames, is(Arrays.asList(new String[] { "apple", "pear" })));
         }
     }
+
+    public static class TestsForSortBy {
+
+        @Test
+        public void shouldSortByNameCorrectly() {
+            List<Fruit> fruits = Arrays.asList(new Fruit("orange"), new Fruit("banana"), new Fruit("pear"));
+            List<Fruit> expectedSortedFruits = Arrays.asList(new Fruit("banana"), new Fruit("orange"), new Fruit("pear"));
+            List<Fruit> sortedFruits = Stream.create(fruits).sortBy(new Func1<Fruit, Comparable>() {
+                @Override
+                public Comparable call(Fruit fruit) {
+                    return fruit.getName();
+                }
+            }).toList();
+            assertThat(sortedFruits, is(expectedSortedFruits));
+        }
+
+    }
 }
