@@ -96,6 +96,22 @@ Reduces this stream to a single value by repeatedly applying the same reduction 
    * `<R>` — the type of the result of the reducted stream
  * **Returns:** the final value after reducing every element
 
+### `public Stream<E> sort(Comparator<E> comparator)`
+
+Sorts this stream using the provided comparator. Note that this is a greedy operation, meaning that this will cause the stream to be materialized for it to be sorted.
+
+ * **Parameters:** `comparator` — the comparator to use as the basis for the sorting
+ * **Returns:** a new stream containing all elements of this stream in the order as specified by the comparator
+
+### `public <T extends Comparable<T>> Stream<E> sortBy(final Func1<E, T> propertySelector)`
+
+Sorts this stream based on a property of each element, provided that that property implements Comparable.
+
+ * **Parameters:**
+   * `propertySelector` — the function that extracts a value from an element so it can be used as the basis for the comparison
+   * `<T>` — the type of the property that is the basis for the comparison
+ * **Returns:** a new stream containing all elements of this stream sorted by the given property
+
 ### `public List<E> toList()`
 
 Turns this stream into a list
