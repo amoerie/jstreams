@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.amoerie.streams.TestModels.makeFruitBasket;
 import static org.hamcrest.CoreMatchers.*;
@@ -200,7 +201,7 @@ public class TestsForStream
                         }
                     })
                     .toList();
-            assertThat(fruitNames, is(Arrays.asList(new String[] { "apple", "pear" })));
+            assertThat(fruitNames, is(Arrays.asList(new String[]{"apple", "pear"})));
         }
     }
 
@@ -217,6 +218,109 @@ public class TestsForStream
                 }
             }).toList();
             assertThat(sortedFruits, is(expectedSortedFruits));
+        }
+
+    }
+
+    public static class TestsForSkip {
+
+        @Test
+        public void shouldNotSkipAnythingWheNumberIsZero() {
+            Set<String> strings = Stream.singleton("abc").skip(0).toSet();
+            assertThat(strings, is(Collections.singleton("abc")));
+        }
+
+        @Test
+        public void shouldSkip3ElementsWhenTheNumberIs3() {
+            List<String> actualStrings = Stream.create(Arrays.asList("one", "two", "three", "four", "five")).skip(3).toList();
+            List<String> expectedStrings = Arrays.asList("four", "five");
+            assertThat(actualStrings, is(expectedStrings));
+        }
+    }
+
+    public static class TestsForTake {
+        @Test
+        public void shouldReturnEmptyStreamIfTakeIs0() {
+            Set<String> strings = Stream.singleton("abc").take(0).toSet();
+            assertThat(strings, is(Collections.<String>emptySet()));
+        }
+
+        @Test
+        public void shouldTakeElementsWhenTheNumberIs3() {
+            List<String> actualStrings = Stream.create(Arrays.asList("one", "two", "three", "four", "five")).take(3).toList();
+            List<String> expectedStrings = Arrays.asList("one", "two", "three");
+            assertThat(actualStrings, is(expectedStrings));
+        }
+    }
+
+    public static class TestsForLength {
+        @Test
+        public void shouldReturn0ForEmptyStreams() {
+            assertThat(Stream.<String>empty().length(), is(0));
+        }
+
+        @Test
+        public void shouldReturnActualLengthForNonEmptyStreams() {
+            assertThat(Stream.create(Arrays.asList("one", "two", "three", "four", "five")).length(), is(5));
+        }
+    }
+
+    public static class TestsForGroupBy {
+
+        @Test
+        public void shouldBeAbleToGroupEmptyStream() {
+            Stream<String> emptyStream = Stream.empty();
+            Stream<Group<String, String>> emptyGroupedStream = Stream.empty();
+            assertThat(emptyStream.groupBy(new Func1<String, String>() {
+                @Override
+                public String call(String s) {
+                    return s;
+                }
+            }).toList(), is(emptyGroupedStream.toList()));
+        }
+
+        @Test
+        public void shouldBeAbleToGroupWithNullKeys() {
+            Fruit apple = new Fruit("apple");
+            Fruit pear = new Fruit("pear");
+            Fruit nothing = new Fruit(null);
+            FruitBasket fruitBasket = makeFruitBasket(apple, pear, nothing);
+            List<Group<String, Fruit>> groups = Stream.create(fruitBasket.getFruitList())
+                    .groupBy(new Func1<Fruit, String>() {
+                        @Override
+                        public String call(Fruit fruit) {
+                            return fruit.getName();
+                        }
+                    }).toList();
+            assertThat(groups.size(), is(3));
+            assertThat(groups.get(0).getKey(), is("apple"));
+            assertThat(groups.get(1).getKey(), is("pear"));
+            assertThat(groups.get(2).getKey(), is((String) null));
+            assertThat(groups.get(0).toList().get(0), is(apple));
+            assertThat(groups.get(1).toList().get(0), is(pear));
+            assertThat(groups.get(2).toList().get(0), is(nothing));
+        }
+
+        @Test
+        public void shouldCorrectlyGroupMultipleItemsWithTheSameKey() {
+            Fruit apple = new Fruit("apple");
+            Fruit secondApple = new Fruit("apple");
+            Fruit banana = new Fruit("banana");
+            FruitBasket fruitBasket = makeFruitBasket(apple, secondApple, banana);
+            List<Group<String, Fruit>> groups = Stream.create(fruitBasket.getFruitList())
+                    .groupBy(new Func1<Fruit, String>() {
+                        @Override
+                        public String call(Fruit fruit) {
+                            return fruit.getName();
+                        }
+                    }).toList();
+
+            assertThat(groups.size(), is(2));
+            assertThat(groups.get(0).getKey(), is("apple"));
+            assertThat(groups.get(1).getKey(), is("banana"));
+            assertThat(groups.get(0).toList().get(0), is(apple));
+            assertThat(groups.get(0).toList().get(1), is(secondApple));
+            assertThat(groups.get(1).toList().get(0), is(banana));
         }
 
     }

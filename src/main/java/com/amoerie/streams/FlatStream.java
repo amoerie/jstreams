@@ -3,7 +3,7 @@ package com.amoerie.streams;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class FlatStream<E> extends Stream<E> {
+class FlatStream<E> extends Stream<E> {
 
     private Stream<Stream<E>> streams;
 

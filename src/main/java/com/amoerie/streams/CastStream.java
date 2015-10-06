@@ -2,7 +2,7 @@ package com.amoerie.streams;
 
 import java.util.Iterator;
 
-public class CastStream<E, C> extends Stream<C> {
+class CastStream<E, C> extends Stream<C> {
 
     private final Class<C> clazz;
     private final Stream<E> stream;

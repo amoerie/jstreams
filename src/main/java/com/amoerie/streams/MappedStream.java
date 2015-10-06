@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 import rx.functions.Func1;
 
-public class MappedStream<E, R> extends Stream<R> {
+class MappedStream<E, R> extends Stream<R> {
 
     private Stream<E> stream;
     private Func1<E, R> mapper;

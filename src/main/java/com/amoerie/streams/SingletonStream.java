@@ -3,7 +3,7 @@ package com.amoerie.streams;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class SingletonStream<E> extends Stream<E> {
+class SingletonStream<E> extends Stream<E> {
 
     private final E element;
 

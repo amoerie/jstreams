@@ -3,7 +3,7 @@ package com.amoerie.streams;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class EmptyStream<E> extends Stream<E> {
+class EmptyStream<E> extends Stream<E> {
     private final Iterator<E> emptyIterator;
 
     public EmptyStream() {

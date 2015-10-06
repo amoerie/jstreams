@@ -1,9 +1,10 @@
 package com.amoerie.streams;
 
-import java.util.*;
-
+import rx.Observable;
 import rx.functions.Func1;
 import rx.functions.Func2;
+
+import java.util.*;
 
 /**
  * Represents a collection of elements that are not known at construction time
@@ -41,9 +42,8 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new stream containing the elements of the array
      */
     public static <E> Stream<E> create(E[] array) {
-        return array != null
-                ? create(Arrays.asList(array))
-                : Stream.<E>empty();
+        if(array == null) throw new IllegalArgumentException("Cannot create a stream for this array because it is null");
+        return create(Arrays.asList(array));
     }
 
     /**
@@ -88,6 +88,30 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Maps each element of this stream to a separate stream, and then flattens the result to one single stream
+     * @param mapper the function that turns one element into a stream of values
+     * @param <R> the type of one mapped element
+     * @return a new stream containing all elements of all the streams the mapper function created
+     */
+    public <R> Stream<R> flatMap(Func1<E, Stream<R>> mapper) {
+        if(mapper == null) throw new IllegalArgumentException("The mapping function cannot be null");
+        return new FlatStream<>(new MappedStream<>(this, mapper));
+    }
+
+    /**
+     * Calculates the amount of elements in this stream
+     * @return the length of this stream
+     */
+    public int length() {
+        return reduce(new Func2<Integer, E, Integer>() {
+            @Override
+            public Integer call(Integer length, E e) {
+                return length + 1;
+            }
+        }, 0);
+    }
+
+    /**
      * Maps each element of this stream to another value
      * @param mapper the function that takes an element as its input and returns any other value
      * @param <R> the type of the element after it has been mapped
@@ -99,33 +123,32 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-     * Maps each element of this stream to a separate stream, and then flattens the result to one single stream
-     * @param mapper the function that turns one element into a stream of values
-     * @param <R> the type of one mapped element
-     * @return a new stream containing all elements of all the streams the mapper function created
-     */
-    public <R> Stream<R> flatMap(Func1<E, Stream<R>> mapper) {
-        if(mapper == null) throw new IllegalArgumentException("The mapping function cannot be null");
-        return new FlatMappedStream<>(this, mapper);
-    }
-
-    /**
      * Reduces this stream to a single value by repeatedly applying the same reduction operator to the
      * current value and the next element.
      * For example, to reduce a stream of integers to a sum:
      * numbers.reduce((sum, number) => sum + number, 0)
-     * @param reduction the reduction function that turns the current value and the next element into the next value
+     * @param reducer the reduction function that turns the current value and the next element into the next value
      * @param <R> the type of the result of the reducted stream
      * @return the final value after reducing every element
      */
-    public <R> R reduce(Func2<R, E, R> reduction, R initialValue) {
-        if(reduction == null) throw new IllegalArgumentException("The reduction function cannot be null");
+    public <R> R reduce(Func2<R, E, R> reducer, R initialValue) {
+        if(reducer == null) throw new IllegalArgumentException("The reducer function cannot be null");
         if(initialValue == null) throw new IllegalArgumentException("The initial value cannot be null");
         R value = initialValue;
         for (E e : this) {
-            value = reduction.call(value, e);
+            value = reducer.call(value, e);
         }
         return value;
+    }
+
+    /**
+     * Skips a certain number of elements of this stream
+     * @param number the number of items to skip
+     * @return a new stream containing the remaining elements of this stream after skipping a certain number of elements
+     */
+    public Stream<E> skip(int number) {
+        if(number < 0) throw new IllegalArgumentException("Cannot skip a negative number of elements");
+        return new SkipStream<>(this, number);
     }
 
     /**
@@ -155,6 +178,35 @@ public abstract class Stream<E> implements Iterable<E> {
                 return propertySelector.call(left).compareTo(propertySelector.call(right));
             }
         });
+    }
+
+    /**
+     * Takes a certain number of elements from this stream and drops the remaining elements
+     * @param number the number of items to take
+     * @return a new stream containing only the first n elements of this stream
+     */
+    public Stream<E> take(int number) {
+        if(number < 0) throw new IllegalArgumentException("Cannot take a negative number of elements");
+        return new TakeStream<>(this, number);
+    }
+
+    /**
+     * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
+     * @param keySelector a function that returns the grouping key for a given element
+     * @param <K> the type of the key
+     * @return a stream containing groups as its elements
+     */
+    public <K> Stream<Group<K, E>> groupBy(Func1<E, K> keySelector) {
+        if(keySelector == null) throw new IllegalArgumentException("cannot group a stream without a key! keySelector cannot be null");
+        return new GroupedStream<>(this, keySelector);
+    }
+
+    /**
+     * Turns this stream into an observable
+     * @return a new cold Observable with the elements of this stream
+     */
+    public Observable<E> toObservable() {
+        return Observable.from(this);
     }
 
     /**

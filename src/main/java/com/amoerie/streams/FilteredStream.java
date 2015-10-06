@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 import rx.functions.Func1;
 
-public class FilteredStream<E> extends Stream<E> {
+class FilteredStream<E> extends Stream<E> {
     private Stream<E> stream;
     private Func1<E, Boolean> filter;
 

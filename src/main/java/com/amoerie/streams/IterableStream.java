@@ -2,7 +2,7 @@ package com.amoerie.streams;
 
 import java.util.Iterator;
 
-public class IterableStream<E> extends Stream<E> {
+class IterableStream<E> extends Stream<E> {
     private final Iterable<E> iterable;
 
     public IterableStream(Iterable<E> iterable) {
