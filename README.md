@@ -16,6 +16,8 @@ For example, you can do the following:
 
 3. Stream operators are chainable, allowing you to do complex things with simple compositions.
 
+See the full Java documentation here: http://amoerie.github.io/jstreams/
+
 ## Documentation
 
 ### `public abstract class Stream<E> implements Iterable<E>`
