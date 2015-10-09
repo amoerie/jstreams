@@ -2,6 +2,10 @@ group 'com.amoerie'
 version '1.0'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+project.sourceCompatibility = 1.6
+project.targetCompatibility = 1.6
 
 repositories {
     mavenCentral()
@@ -9,4 +13,21 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url "$buildDir/maven"
+        }
+    }
 }
