@@ -1,8 +1,8 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
 import java.util.Iterator;
 
-import com.amoerie.streams.functions.Mapper;
+import com.amoerie.jstreams.functions.Mapper;
 
 class MappedStream<E, R> extends Stream<R> {
 

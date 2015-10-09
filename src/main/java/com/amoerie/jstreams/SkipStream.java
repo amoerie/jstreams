@@ -1,25 +1,22 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 
-public class SortedStream<E> extends Stream<E> {
+class SkipStream<E> extends Stream<E> {
 
     private final Stream<E> stream;
-    private final Comparator<E> comparator;
+    private final int number;
 
-    public SortedStream(Stream<E> stream, Comparator<E> comparator) {
+    public SkipStream(Stream<E> stream, int number) {
         this.stream = stream;
-        this.comparator = comparator;
+        this.number = number;
     }
 
     @Override
     public Iterator<E> iterator() {
-        final List<E> list = stream.toList();
-        Collections.sort(list, comparator);
-        final Iterator<E> iterator = list.iterator();
+        final Iterator<E> iterator = this.stream.iterator();
+        for(int skipped = 0; skipped < number && iterator.hasNext(); skipped++)
+            iterator.next();
         return new Iterator<E>() {
             @Override
             public boolean hasNext() {

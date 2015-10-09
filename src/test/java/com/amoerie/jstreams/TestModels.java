@@ -1,4 +1,4 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
 import java.util.Arrays;
 import java.util.Collections;

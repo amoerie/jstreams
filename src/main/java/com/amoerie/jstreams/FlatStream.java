@@ -1,4 +1,4 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

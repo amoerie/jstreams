@@ -1,4 +1,4 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,11 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.amoerie.streams.functions.Mapper;
+import com.amoerie.jstreams.functions.Mapper;
 
-/**
- * Created by alexa on 06-Oct-15.
- */
 class GroupedStream<K, E> extends Stream<Group<K, E>> {
 
     private final Stream<E> stream;

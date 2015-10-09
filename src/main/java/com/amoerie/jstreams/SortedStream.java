@@ -1,35 +1,33 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.List;
 
-class TakeStream<E> extends Stream<E> {
+public class SortedStream<E> extends Stream<E> {
 
     private final Stream<E> stream;
-    private final int number;
+    private final Comparator<E> comparator;
 
-    public TakeStream(Stream<E> stream, int number){
+    public SortedStream(Stream<E> stream, Comparator<E> comparator) {
         this.stream = stream;
-        this.number = number;
+        this.comparator = comparator;
     }
 
     @Override
     public Iterator<E> iterator() {
-        final Iterator<E> iterator = stream.iterator();
+        final List<E> list = stream.toList();
+        Collections.sort(list, comparator);
+        final Iterator<E> iterator = list.iterator();
         return new Iterator<E>() {
-            private int taken = 0;
-
             @Override
             public boolean hasNext() {
-                return taken < number && iterator.hasNext();
+                return iterator.hasNext();
             }
 
             @Override
             public E next() {
-                if(taken == number) {
-                    throw new NoSuchElementException();
-                }
-                taken++;
                 return iterator.next();
             }
 

@@ -1,10 +1,10 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
-import com.amoerie.streams.TestModels.Apple;
-import com.amoerie.streams.TestModels.Fruit;
-import com.amoerie.streams.TestModels.FruitBasket;
-import com.amoerie.streams.functions.Filter;
-import com.amoerie.streams.functions.Mapper;
+import com.amoerie.jstreams.TestModels.Apple;
+import com.amoerie.jstreams.TestModels.Fruit;
+import com.amoerie.jstreams.TestModels.FruitBasket;
+import com.amoerie.jstreams.functions.Filter;
+import com.amoerie.jstreams.functions.Mapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 
 import java.util.*;
 
-import static com.amoerie.streams.TestModels.makeFruitBasket;
+import static com.amoerie.jstreams.TestModels.makeFruitBasket;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 

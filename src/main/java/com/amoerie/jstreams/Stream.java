@@ -1,8 +1,8 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
-import com.amoerie.streams.functions.Filter;
-import com.amoerie.streams.functions.Mapper;
-import com.amoerie.streams.functions.Reducer;
+import com.amoerie.jstreams.functions.Filter;
+import com.amoerie.jstreams.functions.Mapper;
+import com.amoerie.jstreams.functions.Reducer;
 
 import java.util.*;
 
@@ -116,7 +116,7 @@ public abstract class Stream<E> implements Iterable<E> {
      *
      * @param mapper the function that turns one element into a stream of values
      * @param <R>    the type of one mapped element
-     * @return a new stream containing all elements of all the streams the mapper function created
+     * @return a new stream containing all elements of all the jstreams the mapper function created
      */
     public <R> Stream<R> flatMap(Mapper<E, Stream<R>> mapper) {
         if (mapper == null)

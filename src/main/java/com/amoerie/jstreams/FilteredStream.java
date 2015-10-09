@@ -1,9 +1,9 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.amoerie.streams.functions.Filter;
+import com.amoerie.jstreams.functions.Filter;
 
 class FilteredStream<E> extends Stream<E> {
     private Stream<E> stream;

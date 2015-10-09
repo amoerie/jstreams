@@ -1,10 +1,7 @@
-package com.amoerie.streams;
+package com.amoerie.jstreams;
 
 import java.util.Iterator;
 
-/**
- * Created by alexa on 06-Oct-15.
- */
 class GroupImpl<TKey, T> extends Group<TKey, T> {
 
     private TKey key;
