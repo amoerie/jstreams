@@ -18,6 +18,10 @@ For example, you can do the following:
 
 See the full Java documentation here: http://amoerie.github.io/jstreams/
 
+## How do I use this
+
+Right now, all you can do is download the zip from the releases page and manually include it. I have a request pending on the Sonatype central to publish to Maven, I'll update this readme when that happens. 
+
 ## Documentation
 
 ### `public abstract class Stream<E> implements Iterable<E>`
