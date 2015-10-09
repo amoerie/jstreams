@@ -1,4 +1,4 @@
-# Streams
+# JStreams
 
 Contains Java 7 compatible streams that are immutable, lazy and chainable.
 
