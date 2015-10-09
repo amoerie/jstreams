@@ -2,14 +2,14 @@ package com.amoerie.streams;
 
 import java.util.Iterator;
 
-import rx.functions.Func1;
+import com.amoerie.streams.functions.Mapper;
 
 class MappedStream<E, R> extends Stream<R> {
 
     private Stream<E> stream;
-    private Func1<E, R> mapper;
+    private Mapper<E, R> mapper;
 
-    MappedStream(Stream<E> stream, Func1<E, R> mapper) {
+    MappedStream(Stream<E> stream, Mapper<E, R> mapper) {
         this.stream = stream;
         this.mapper = mapper;
     }
@@ -25,7 +25,7 @@ class MappedStream<E, R> extends Stream<R> {
 
             @Override
             public R next() {
-                return mapper.call(iterator.next());
+                return mapper.map(iterator.next());
             }
 
             @Override

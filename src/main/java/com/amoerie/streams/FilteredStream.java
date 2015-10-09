@@ -3,13 +3,13 @@ package com.amoerie.streams;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import rx.functions.Func1;
+import com.amoerie.streams.functions.Filter;
 
 class FilteredStream<E> extends Stream<E> {
     private Stream<E> stream;
-    private Func1<E, Boolean> filter;
+    private Filter<E> filter;
 
-    FilteredStream(Stream<E> stream, Func1<E, Boolean> filter) {
+    FilteredStream(Stream<E> stream, Filter<E> filter) {
         this.stream = stream;
         this.filter = filter;
     }
@@ -17,7 +17,7 @@ class FilteredStream<E> extends Stream<E> {
     private E getNextFilteredElement(Iterator<E> iterator) {
         while(iterator.hasNext()) {
             E next = iterator.next();
-            if(filter.call(next))
+            if(filter.apply(next))
                 return next;
         }
         return null;

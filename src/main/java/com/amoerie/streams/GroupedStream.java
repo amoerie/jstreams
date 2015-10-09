@@ -6,9 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
-import rx.functions.Func1;
+import com.amoerie.streams.functions.Mapper;
 
 /**
  * Created by alexa on 06-Oct-15.
@@ -16,18 +15,18 @@ import rx.functions.Func1;
 class GroupedStream<K, E> extends Stream<Group<K, E>> {
 
     private final Stream<E> stream;
-    private final Func1<E, K> keySelector;
+    private final Mapper<E, K> keyMapper;
 
-    public GroupedStream(Stream<E> stream, Func1<E, K> keySelector) {
+    public GroupedStream(Stream<E> stream, Mapper<E, K> keyMapper) {
         this.stream = stream;
-        this.keySelector = keySelector;
+        this.keyMapper = keyMapper;
     }
 
     @Override
     public Iterator<Group<K, E>> iterator() {
         final Map<K, List<E>> groupMap = new LinkedHashMap<>();
         for(E element: stream) {
-            K key = keySelector.call(element);
+            K key = keyMapper.map(element);
             List<E> elementsWithThisKey;
             if(groupMap.containsKey(key)) {
                 elementsWithThisKey = groupMap.get(key);
