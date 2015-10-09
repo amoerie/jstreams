@@ -1,6 +1,6 @@
-# Streams
+# JStreams
 
-Contains Java 7 compatible streams that are immutable, lazy and chainable.
+Contains Java 6 compatible streams that are immutable, lazy and chainable.
 
 - For the C# developers: This library looks A LOT like Linq To Objects, the only difference being that the method names are more conventional ('filter' instead of 'Where', etc.).
 
