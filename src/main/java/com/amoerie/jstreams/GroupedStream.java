@@ -21,14 +21,14 @@ class GroupedStream<K, E> extends Stream<Group<K, E>> {
 
     @Override
     public Iterator<Group<K, E>> iterator() {
-        final Map<K, List<E>> groupMap = new LinkedHashMap<>();
+        final Map<K, List<E>> groupMap = new LinkedHashMap<K, List<E>>();
         for(E element: stream) {
             K key = keyMapper.map(element);
             List<E> elementsWithThisKey;
             if(groupMap.containsKey(key)) {
                 elementsWithThisKey = groupMap.get(key);
             } else {
-                elementsWithThisKey = new ArrayList<>();
+                elementsWithThisKey = new ArrayList<E>();
                 groupMap.put(key, elementsWithThisKey);
             }
             elementsWithThisKey.add(element);
@@ -46,7 +46,7 @@ class GroupedStream<K, E> extends Stream<Group<K, E>> {
                     throw new NoSuchElementException();
                 }
                 Map.Entry<K, List<E>> next = iterator.next();
-                return new GroupImpl<>(next.getKey(), Stream.create(next.getValue()));
+                return new GroupImpl<K, E>(next.getKey(), Stream.create(next.getValue()));
             }
 
             @Override

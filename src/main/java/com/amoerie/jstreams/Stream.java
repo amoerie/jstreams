@@ -25,7 +25,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new empty stream containing no elements
      */
     public static <E> Stream<E> empty() {
-        return new EmptyStream<>();
+        return new EmptyStream<E>();
     }
 
     /**
@@ -36,7 +36,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new stream containing exactly one element
      */
     public static <E> Stream<E> singleton(E element) {
-        return new SingletonStream<>(element);
+        return new SingletonStream<E>(element);
     }
 
     /**
@@ -63,7 +63,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public static <E> Stream<E> create(Iterable<E> iterable) {
         if(iterable == null)
             throw new IllegalArgumentException("Unable to create a stream from this iterable because it is null!");
-        return new IterableStream<>(iterable);
+        return new IterableStream<E>(iterable);
     }
 
     /**
@@ -76,7 +76,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public <C> Stream<C> cast(Class<C> clazz) {
         if (clazz == null)
             throw new IllegalArgumentException("Unable to cast this stream because the class to cast to is null!");
-        return new CastStream<>(this, clazz);
+        return new CastStream<E, C>(this, clazz);
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new stream containing all the elements of this stream and the other stream
      */
     public Stream<E> concat(Stream<E> other) {
-        return new FlatStream<>(create(Arrays.asList(this, other)));
+        return new FlatStream<E>(create(Arrays.asList(this, other)));
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public Stream<E> filter(Filter<E> filter) {
         if (filter == null)
             throw new IllegalArgumentException("Unable to filter this stream because the filter is null!");
-        return new FilteredStream<>(this, filter);
+        return new FilteredStream<E>(this, filter);
     }
 
     /**
@@ -121,7 +121,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public <R> Stream<R> flatMap(Mapper<E, Stream<R>> mapper) {
         if (mapper == null)
             throw new IllegalArgumentException("Unable to flatMap this stream because the mapper is null!");
-        return new FlatStream<>(new MappedStream<>(this, mapper));
+        return new FlatStream<R>(new MappedStream<E, Stream<R>>(this, mapper));
     }
 
     /**
@@ -176,7 +176,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public <R> Stream<R> map(Mapper<E, R> mapper) {
         if (mapper == null)
             throw new IllegalArgumentException("Unable to map this stream because the mapper is null!");
-        return new MappedStream<>(this, mapper);
+        return new MappedStream<E, R>(this, mapper);
     }
 
     /**
@@ -208,7 +208,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public Stream<E> skip(int number) {
         if (number < 0)
             throw new IllegalArgumentException("Unable to skip a number of elements of this stream because the number is negative!");
-        return new SkipStream<>(this, number);
+        return new SkipStream<E>(this, number);
     }
 
     /**
@@ -232,7 +232,7 @@ public abstract class Stream<E> implements Iterable<E> {
      */
     public Stream<E> sort(Comparator<E> comparator) {
         if (comparator == null) throw new IllegalArgumentException("Unable to sort stream, comparator cannot be null!");
-        return new SortedStream<>(this, comparator);
+        return new SortedStream<E>(this, comparator);
     }
 
     /**
@@ -279,7 +279,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public Stream<E> take(int number) {
         if (number < 0)
             throw new IllegalArgumentException("Unable to take a number of elements of this stream because the number is negative!");
-        return new TakeStream<>(this, number);
+        return new TakeStream<E>(this, number);
     }
 
     /**
@@ -292,7 +292,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public <K> Stream<Group<K, E>> groupBy(Mapper<E, K> keyMapper) {
         if (keyMapper == null)
             throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
-        return new GroupedStream<>(this, keyMapper);
+        return new GroupedStream<K, E>(this, keyMapper);
     }
 
     /**
