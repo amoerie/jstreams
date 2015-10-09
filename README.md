@@ -31,7 +31,7 @@ Creates a new empty stream, containing no elements
  * **Parameters:** `<E>` — the type of the elements of this stream
  * **Returns:** a new empty stream containing no elements
 
-### `public static <E> Stream<E> singleton(E element)`
+### `public static <E> Stream<E> singleton(final E element)`
 
 Creates a new singleton stream, containing exactly one element
 
@@ -40,7 +40,7 @@ Creates a new singleton stream, containing exactly one element
    * `<E>` — the type of the single element
  * **Returns:** a new stream containing exactly one element
 
-### `public static <E> Stream<E> create(E[] array)`
+### `public static <E> Stream<E> create(final E[] array)`
 
 Creates a new stream from the provided array of elements
 
@@ -49,7 +49,7 @@ Creates a new stream from the provided array of elements
    * `<E>` — the type of the elements
  * **Returns:** a new stream containing the elements of the array
 
-### `public static <E> Stream<E> create(Iterable<E> iterable)`
+### `public static <E> Stream<E> create(final Iterable<E> iterable)`
 
 Creates a new stream from the provided iterable This is a lazy operation, it does not consume the iterable until a consuming operation is called, such as toList()
 
@@ -58,7 +58,7 @@ Creates a new stream from the provided iterable This is a lazy operation, it doe
    * `<E>` — the type of an element
  * **Returns:** a new stream containing the elements of the iterable
 
-### `public <C> Stream<C> cast(Class<C> clazz)`
+### `public <C> Stream<C> cast(final Class<C> clazz)`
 
 Casts every element of this stream to another class
 
@@ -67,14 +67,14 @@ Casts every element of this stream to another class
    * `<C>` — the type of the class to cast to
  * **Returns:** a new stream containing every element casted to another class
 
-### `public Stream<E> concat(Stream<E> other)`
+### `public Stream<E> concat(final Stream<E> other)`
 
 Concatenates this stream with another stream
 
  * **Parameters:** `other` — the other stream to concatenate with
  * **Returns:** a new stream containing all the elements of this stream and the other stream
 
-### `public Stream<E> filter(Filter<E> filter)`
+### `public Stream<E> filter(final Filter<E> filter)`
 
 Filters the elements of this stream with the given filter.
 
@@ -87,7 +87,7 @@ Gets the first element of this stream
 
  * **Returns:** the first element of this stream or null if the stream is empty
 
-### `public <R> Stream<R> flatMap(Mapper<E, Stream<R>> mapper)`
+### `public <R> Stream<R> flatMap(final Mapper<E, Stream<R>> mapper)`
 
 Maps each element of this stream to a separate stream, and then flattens the result to one single stream
 
@@ -117,7 +117,7 @@ Filters out the elements that are of a certain class
    * `<C>` — the type of the class
  * **Returns:** a new stream containing only the elements of the provided class
 
-### `public <R> Stream<R> map(Mapper<E, R> mapper)`
+### `public <R> Stream<R> map(final Mapper<E, R> mapper)`
 
 Maps each element of this stream to another value
 
@@ -126,7 +126,7 @@ Maps each element of this stream to another value
    * `<R>` — the type of the element after it has been mapped
  * **Returns:** a new stream containing the mapped elements
 
-### `public <R> R reduce(Reducer<E, R> reducer, R initialValue)`
+### `public <R> R reduce(final Reducer<E, R> reducer, final R initialValue)`
 
 Reduces this stream to a single value by repeatedly applying the same reduction operator to the current value and the next element. For example, to reduce a stream of integers to a sum: numbers.reduce((sum, number) => sum + number, 0)
 
@@ -135,21 +135,21 @@ Reduces this stream to a single value by repeatedly applying the same reduction 
    * `<R>` — the type of the result of the reduced stream
  * **Returns:** the final value after reducing every element
 
-### `public Stream<E> skip(int number)`
+### `public Stream<E> skip(final int number)`
 
 Skips a certain number of elements of this stream
 
  * **Parameters:** `number` — the number of items to skip
  * **Returns:** a new stream containing the remaining elements of this stream after skipping a certain number of elements
 
-### `public boolean some(Filter<E> filter)`
+### `public boolean some(final Filter<E> filter)`
 
 Determines whether any of the elements in this stream satisfy the given predicate
 
  * **Parameters:** `filter` — the filter that returns true or false for any given element
  * **Returns:** true if one of the elements satisfied the predicate or false otherwise
 
-### `public Stream<E> sort(Comparator<E> comparator)`
+### `public Stream<E> sort(final Comparator<E> comparator)`
 
 Sorts this stream using the provided comparator. This operator is lazy but greedy, meaning that it will wait as long as possible to actually materialize your stream to sort it. Once you start iterating over the elements, it will sort just in time. Note that multiple iterations will also a separate sort every time.
 
@@ -174,14 +174,14 @@ Sorts this stream descendingly based on a mapped value of each element, provided
    * `<T>` — the type of the property that is the basis for the comparison
  * **Returns:** a new stream containing all elements of this stream sorted by the given property
 
-### `public Stream<E> take(int number)`
+### `public Stream<E> take(final int number)`
 
 Takes a certain number of elements from this stream and drops the remaining elements
 
  * **Parameters:** `number` — the number of items to take
  * **Returns:** a new stream containing only the first n elements of this stream
 
-### `public <K> Stream<Group<K, E>> groupBy(Mapper<E, K> keyMapper)`
+### `public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper)`
 
 Groups this stream into chunks based on the key per element that is retrieved via the keySelector
 
