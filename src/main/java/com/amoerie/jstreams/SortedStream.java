@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public class SortedStream<E> extends Stream<E> {
+class SortedStream<E> extends Stream<E> {
 
     private final Stream<E> stream;
     private final Comparator<E> comparator;

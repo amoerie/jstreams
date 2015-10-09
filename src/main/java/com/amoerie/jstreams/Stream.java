@@ -54,7 +54,7 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Creates a new stream from the provided iterable
-     * This is a lazy operation, it does not consume the iterable until a consuming operation is called, such as toList()
+     * This is a lazy operation, it does not consume the iterable until a greedy operation is called, such as toList()
      *
      * @param iterable an iterable containing elements
      * @param <E>      the type of an element
