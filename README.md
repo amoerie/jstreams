@@ -16,6 +16,15 @@ For example, you can do the following:
 
 3. Stream operators are chainable, allowing you to do complex things with simple compositions.
 
+## Why did you make this, I thought Java had streams now?
+
+The reasons I created this are:
+
+- Android does not run Java 8. Even with Retrolambda, which introduces the nice arrow syntax, you still don't get the Streams because those are only included in the actual JDK 8.
+- Other libraries that attempt this sort of thing are either outdated, not well documented or are very bloated.
+
+This library is explicitly called JStreams to accentuate how it's mostly the same thing as Java 8 streams. If you can use JDK 8, you probably should not use this.
+
 ## How do I use this
 
 Right now, all you can do is download the zip from the releases page and manually include it. I have a request pending on the Sonatype central to publish to Maven, I'll update this readme when that happens. 
