@@ -203,6 +203,57 @@ public class TestsForStream {
             }).toList();
             assertThat(fruits, is(Collections.<Fruit>emptyList()));
         }
+
+        @Test
+        public void callingHasNextMultipleTimesShouldNotSkipElements() {
+            final Iterator<Fruit> fruitIterator = Stream.create(fruitBasket).filter(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().startsWith("p");
+                }
+            }).iterator();
+            assertTrue(fruitIterator.hasNext());
+            assertTrue(fruitIterator.hasNext());
+
+            List<Fruit> fruitList = new IterableStream<Fruit>(new Iterable<Fruit>() {
+                @Override
+                public Iterator<Fruit> iterator() {
+                    return fruitIterator;
+                }
+            }).toList();
+            assertThat(fruitList, is(Arrays.asList(new Fruit[]{
+                    new Fruit("pear"),
+                    new Fruit("pineapple"),
+            })));
+        }
+
+        @Test
+        public void callingNextMultipleTimesShouldNotSkipElements() {
+            final Iterator<Fruit> fruitIterator = Stream.create(fruitBasket).filter(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().startsWith("p");
+                }
+            }).iterator();
+            assertThat(fruitIterator.next(), is(new Fruit("pear")));
+            assertThat(fruitIterator.next(), is(new Fruit("pineapple")));
+            assertFalse(fruitIterator.hasNext());
+        }
+
+        @Test
+        public void filteringOnNullsShouldWork() {
+            final Iterator<Fruit> fruitIterator = Stream.create(fruitBasket)
+                    .concat(Stream.singleton((Fruit) null))
+                    .filter(new Filter<Fruit>() {
+                        @Override
+                        public boolean apply(Fruit fruit) {
+                            return fruit == null;
+                        }
+                    })
+                    .iterator();
+            assertThat(fruitIterator.next(), is((Fruit) null));
+            assertFalse(fruitIterator.hasNext());
+        }
     }
 
     public static class TestsForFlatMap {
