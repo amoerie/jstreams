@@ -90,6 +90,14 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Filters this stream to only have unique elements.
+     * @return a new stream containing only unique elements.
+     */
+    public Stream<E> distinct() {
+        return new DistinctStream<E>(this);
+    }
+
+    /**
      * Filters the elements of this stream with the given filter.
      *
      * @param filter the predicate that returns true or false for a given element

@@ -88,6 +88,23 @@ public class TestsForStream {
 
     }
 
+    public static class TestsForDistinct {
+
+        @Test
+        public void shouldReturnAnEmptyStreamIfTheStreamIsEmpty() {
+            assertThat(Stream.<String>empty().distinct().toList(), is(Collections.<String>emptyList()));
+        }
+
+        @Test
+        public void shouldCorrectlyFilterOutTheDuplicateElements() {
+            List<String> fruits = Arrays.asList("Pear", "Apple", "Banana", "Pear", "Banana", "Pineapple");
+            List<String> distinctFruits = Stream.create(fruits).distinct().toList();
+            List<String> expectedFruits = Arrays.asList("Pear", "Apple", "Banana", "Pineapple");
+            assertThat(distinctFruits, is(expectedFruits));
+        }
+
+    }
+
     public static class TestsForEmpty {
 
         @Test
