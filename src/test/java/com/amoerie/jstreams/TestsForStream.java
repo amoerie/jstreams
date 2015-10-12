@@ -463,27 +463,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnTrueIfTheListIsInfinitelyLongButThePearIsPresent() {
             Stream<Fruit> infiniteFruits // solving world hunger, one pear at a time
-                    = Stream.create(new Iterable<Fruit>() {
-                @Override
-                public Iterator<Fruit> iterator() {
-                    return new Iterator<Fruit>() {
-                        @Override
-                        public boolean hasNext() {
-                            return true;
-                        }
-
-                        @Override
-                        public Fruit next() {
-                            return new Fruit("pear");
-                        }
-
-                        @Override
-                        public void remove() {
-                            throw new UnsupportedOperationException();
-                        }
-                    };
-                }
-            });
+                    = new InfiniteStream<Fruit>(new Fruit("pear"));
             assertTrue(infiniteFruits.some(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
