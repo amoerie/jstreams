@@ -41,6 +41,29 @@ Or if you use Gradle, add this to your `build.gradle` file
 
 Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
 
+## Pull requests
+
+I am taking pull requests! This library is quite minimal, so I expect there to be times when the API is a bit too limited to satisfy all your needs. 
+
+#### Getting started
+
+1. Import this project into your IDE of choice as a Gradle project. There is no other special setup you need to do.
+
+#### Guidelines 
+
+If you want to make sure your pull request gets accepted, follow these guidelines:
+
+- Follow functional conventions. If you add a method that does not exist in any other language or framework, rethink what you're doing. If it does exist elsewhere, find the name that is most commonly used across languages/frameworks.
+
+- Write at least 2 unit tests covering the empty stream scenario and a "happy case" scenario. See the existing tests. 
+
+- Write javadoc for the public parts of the API.
+ 
+Other tips:
+
+- Try to reuse existing operators. For example, `toList` and `length`are just specialized use cases of `reduce`
+- Try to avoid writing code inside the Stream base class. See the private `FlatStream`, `MappedStream`, ... classes if you need an example.
+
 ## Documentation
 
 See the full Java documentation here: http://amoerie.github.io/jstreams/
