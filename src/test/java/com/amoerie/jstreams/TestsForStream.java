@@ -103,6 +103,15 @@ public class TestsForStream {
             assertThat(distinctFruits, is(expectedFruits));
         }
 
+        @Test
+        public void shouldCorrectlyDistinctFromAnInfiniteStream() {
+            Stream<String> infiniteFruits = Stream.create(Arrays.asList("Pear", "Apple", "Banana", "Pear", "Banana", "Pineapple"))
+                    .concat(new InfiniteStream<String>("Grape"));
+            List<String> distinctFruits = infiniteFruits.distinct().take(4).toList();
+            List<String> expectedFruits = Arrays.asList("Pear", "Apple", "Banana", "Pineapple");
+            assertThat(distinctFruits, is(expectedFruits));
+        }
+
     }
 
     public static class TestsForEmpty {
