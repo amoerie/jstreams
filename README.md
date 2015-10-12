@@ -57,7 +57,7 @@ If you want to make sure your pull request gets accepted, follow these guideline
 
 - Follow functional conventions. If you add a method that does not exist in any other language or framework, rethink what you're doing. If it does exist elsewhere, find the name that is most commonly used across languages/frameworks.
 
-- Write at least 2 unit tests covering the empty stream scenario and a "happy case" scenario. See the existing tests. 
+- Write at least 3 unit tests covering the empty stream scenario, a "happy case" scenario and an infinite stream scenario (if applicable). See the existing tests. 
 
 - Write javadoc for the public parts of the API.
  
