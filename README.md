@@ -27,7 +27,19 @@ This library is explicitly called JStreams to accentuate how it's mostly the sam
 
 ## How do I use this
 
-Right now, all you can do is download the zip from the releases page and manually include it. I have a request pending on the Sonatype central to publish to Maven, I'll update this readme when that happens. 
+You can use Maven! Add this to your <dependencies> in your pom.xml:
+
+      <dependency>
+            <groupId>com.amoerie</groupId>
+            <artifactId>jstreams</artifactId>
+            <version>1.0</version>
+      </dependency>
+
+Or if you use Gradle, add this to your build.gradle file 
+
+    compile 'com.amoerie:jstreams:1.0'
+
+Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
 
 ## Documentation
 
