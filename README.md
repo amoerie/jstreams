@@ -27,7 +27,7 @@ This library is explicitly called JStreams to accentuate how it's mostly the sam
 
 ## How do I use this
 
-You can use Maven! Add this to your <dependencies> in your pom.xml:
+You can use Maven! Add this to your `<dependencies>` in your pom.xml:
 
       <dependency>
             <groupId>com.amoerie</groupId>
@@ -35,7 +35,7 @@ You can use Maven! Add this to your <dependencies> in your pom.xml:
             <version>1.0</version>
       </dependency>
 
-Or if you use Gradle, add this to your build.gradle file 
+Or if you use Gradle, add this to your `build.gradle` file 
 
     compile 'com.amoerie:jstreams:1.0'
 
