@@ -13,8 +13,9 @@ Contains Java 6 compatible streams that are immutable, lazy and chainable.
 1. Streams are immutable. Once a stream has been created, you cannot change it. The only thing you can do is make new streams starting from that stream. 
 2. Streams are lazy. Enumerating the elements of a stream is always postponed as much as possible. There are some methods which absolutely require iteration, which I call "greedy operators". Some examples of greedy operators are `sortBy`, `length`, `toList` and `last`. Most operators are lazy, these are delayed until a greedy operator is called.
 For example, you can do the following:
-
-      `List<String> firstFiveStrings = Stream.create(infiniteStrings).take(5).toList();`
+```java
+      List<String> firstFiveStrings = Stream.create(infiniteStrings).take(5).toList();
+```
 
 3. Stream operators are chainable, allowing you to do complex things with simple compositions.
 
@@ -31,15 +32,19 @@ This library is explicitly called JStreams to accentuate how it's mostly the sam
 
 You can use Maven! Add this to your `<dependencies>` in your pom.xml:
 
+```xml
       <dependency>
             <groupId>com.amoerie</groupId>
             <artifactId>jstreams</artifactId>
             <version>1.0</version>
       </dependency>
+```
 
 Or if you use Gradle, add this to your `build.gradle` file 
 
+```groovy
     compile 'com.amoerie:jstreams:1.0'
+```
 
 Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
 
