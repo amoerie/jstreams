@@ -551,5 +551,18 @@ public class TestsForStream {
         }
     }
 
+    public static class TestsForWithout {
 
+        @Test
+        public void shouldNotHaveAnyImpactWhenTheStreamToFilterWithIsEmpty() {
+            List<String> names = Stream.create(new String[]{"abc", "def", "xyz"}).without(Stream.<String>empty()).toList();
+            assertThat(names, is(Arrays.asList("abc", "def", "xyz")));
+        }
+
+        @Test
+        public void shouldCorrectlyFilterOutTheNamesFromTheOtherStream() {
+            List<String> names = Stream.create(new String[]{"abc", "def", "xyz"}).without(Stream.create(Arrays.asList("def", "abc"))).toList();
+            assertThat(names, is(Arrays.asList("xyz")));
+        }
+    }
 }

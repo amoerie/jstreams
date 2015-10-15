@@ -2,7 +2,7 @@ package com.amoerie.jstreams;
 
 import java.util.Iterator;
 
-public class InfiniteStream<E> extends Stream<E> {
+class InfiniteStream<E> extends Stream<E> {
 
     private final E value;
 

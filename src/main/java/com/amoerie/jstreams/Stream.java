@@ -133,6 +133,19 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
+     *
+     * @param keyMapper a function that returns the grouping key for a given element
+     * @param <K>         the type of the key
+     * @return a stream containing groups as its elements
+     */
+    public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper) {
+        if (keyMapper == null)
+            throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
+        return new GroupedStream<K, E>(this, keyMapper);
+    }
+
+    /**
      * Gets the last element of this stream
      *
      * @return the last element of this stream or null if the stream is empty
@@ -291,19 +304,6 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-     * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
-     *
-     * @param keyMapper a function that returns the grouping key for a given element
-     * @param <K>         the type of the key
-     * @return a stream containing groups as its elements
-     */
-    public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper) {
-        if (keyMapper == null)
-            throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
-        return new GroupedStream<K, E>(this, keyMapper);
-    }
-
-    /**
      * Turns this stream into a list
      *
      * @return a new list containing all the elements of this stream
@@ -331,5 +331,16 @@ public abstract class Stream<E> implements Iterable<E> {
                 return set;
             }
         }, new HashSet<E>());
+    }
+
+    /**
+     * Filters out elements from this stream based on the elements from another.
+     * Only elements that are NOT in the other stream are allowed to pass through.
+     * @param other the stream containing elements that are forbidden to pass through
+     * @return a new stream containing only elements that cannot be found in the other stream
+     */
+    public Stream<E> without(final Stream<E> other) {
+        if(other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
+        return new WithoutStream<E>(this, other);
     }
 }
