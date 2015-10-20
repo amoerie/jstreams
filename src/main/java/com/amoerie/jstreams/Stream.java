@@ -1,12 +1,6 @@
 package com.amoerie.jstreams;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
@@ -399,6 +393,45 @@ public abstract class Stream<E> implements Iterable<E> {
                 return list;
             }
         }, new ArrayList<E>());
+    }
+
+    /**
+     * Creates a {@link Map} from this stream.
+     * Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained.
+     * If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+     * @param keyMapper the mapper function that computes a key for each element
+     * @param <K> the type of the key for each entry in the map
+     * @return a new map containing entries for each element (that had a unique key)
+     */
+    public <K> Map<K, E> toMap(final Mapper<E, K> keyMapper) {
+        return toMap(keyMapper, new Mapper<E, E>() {
+            @Override
+            public E map(E e) {
+                return e;
+            }
+        });
+    }
+
+    /**
+     * Creates a {@link Map} from this stream.
+     * Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained.
+     * If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+     * @param keyMapper the mapper function that computes a key for each element
+     * @param valueMapper the mapper function that computes a value for each element
+     * @param <K> the type of the key for each entry in the map
+     * @param <V> the type of the value for each entry in the map
+     * @return a new map containing entries for each element (that had a unique key)
+     */
+    public <K, V> Map<K, V> toMap(final Mapper<E, K> keyMapper, final Mapper<E, V> valueMapper) {
+        if(keyMapper == null)
+            throw new IllegalArgumentException("Cannot convert this stream to a Map because the keyMapper is null");
+        return this.reduce(new Reducer<E, Map<K, V>>() {
+            @Override
+            public Map<K, V> reduce(Map<K, V> map, E e) {
+                map.put(keyMapper.map(e), valueMapper.map(e));
+                return map;
+            }
+        }, new HashMap<K, V>());
     }
 
     /**

@@ -9,14 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -124,7 +117,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnTrueIfAPearIfPresent() {
             FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("pineapple"));
-            assertTrue(fruits.asStream().some(new Filter<Fruit>() {
+            assertTrue(fruits.asStream().any(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
                     return fruit.getName().equals("pear");
@@ -135,7 +128,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnFalseIfNoPearIfPresent() {
             FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("banana"));
-            assertFalse(fruits.asStream().some(new Filter<Fruit>() {
+            assertFalse(fruits.asStream().any(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
                     return fruit.getName().equals("pear");
@@ -147,7 +140,7 @@ public class TestsForStream {
         public void shouldReturnTrueIfTheListIsInfinitelyLongButThePearIsPresent() {
             Stream<Fruit> infiniteFruits // solving world hunger, one pear at a time
                     = new InfiniteStream<Fruit>(new Fruit("pear"));
-            assertTrue(infiniteFruits.some(new Filter<Fruit>() {
+            assertTrue(infiniteFruits.any(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
                     return fruit.getName().equals("pear");
@@ -158,7 +151,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnTrueIfThePredicateChecksForNull() {
             Stream<String> strings = Stream.create("abc", null, "def");
-            assertThat(strings.some(new Filter<String>() {
+            assertThat(strings.any(new Filter<String>() {
                 @Override
                 public boolean apply(String s) {
                     return s == null;
@@ -386,6 +379,25 @@ public class TestsForStream {
             assertThat(fruitIterator.next(), is((Fruit) null));
             assertFalse(fruitIterator.hasNext());
         }
+    }
+
+    public static class TestsForFirst {
+
+        @Test
+        public void shouldReturnNullOnAnEmptyStream() {
+            assertThat(Stream.<String>empty().first(), is((String) null));
+        }
+
+        @Test
+        public void shouldReturnTheFirstElementOnANonEmptyStream() {
+            assertThat(Stream.create("abc", "def").first(), is("abc"));
+        }
+
+        @Test
+        public void shouldReturnTheFirstElementOnAnInfiniteStream() {
+            assertThat(new InfiniteStream<String>("abc").first(), is("abc"));
+        }
+
     }
 
     public static class TestsForFlatMap {
@@ -670,6 +682,41 @@ public class TestsForStream {
             List<String> expectedStrings = Arrays.asList("one", "two", "three");
             assertThat(actualStrings, is(expectedStrings));
         }
+    }
+
+    public static class TestsForToMap {
+
+        @Test
+        public void shouldCreateAnEmptyMapFromAnEmptyStream() {
+            Map<String, Fruit> map = Stream.<Fruit>empty().toMap(getFruitName);
+            assertTrue(map.isEmpty());
+        }
+
+        @Test
+        public void shouldCreateACorrectMapByFruitName() {
+            Map<String, Fruit> map = makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("banana")).asStream().toMap(getFruitName);
+            assertThat(map.get("apple"), is(new Fruit("apple")));
+            assertThat(map.get("pear"), is(new Fruit("pear")));
+            assertThat(map.get("banana"), is(new Fruit("banana")));
+            assertThat(map.size(), is(3));
+        }
+
+        @Test
+        public void shouldCreateACorrectMapByFruitNameAndNameLength() {
+            Map<String, Integer> map = makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("banana"))
+                    .asStream()
+                    .toMap(getFruitName, new Mapper<Fruit, Integer>() {
+                        @Override
+                        public Integer map(Fruit fruit) {
+                            return fruit.getName().length();
+                        }
+                    });
+            assertThat(map.get("apple"), is(5));
+            assertThat(map.get("pear"), is(4));
+            assertThat(map.get("banana"), is(6));
+            assertThat(map.size(), is(3));
+        }
+
     }
 
     public static class TestsForWithout {
