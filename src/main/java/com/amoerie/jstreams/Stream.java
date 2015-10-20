@@ -24,15 +24,7 @@ public abstract class Stream<E> implements Iterable<E> {
     protected Stream() {
     }
 
-    /**
-     * Creates a new empty stream, containing no elements
-     *
-     * @param <E> the type of the elements of this stream
-     * @return a new empty stream containing no elements
-     */
-    public static <E> Stream<E> empty() {
-        return new EmptyStream<E>();
-    }
+    /* static methods (alphabetically) */
 
     /**
      * Creates a new stream from the provided array of elements
@@ -62,14 +54,13 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-     * Creates a new singleton stream, containing exactly one element
+     * Creates a new empty stream, containing no elements
      *
-     * @param element the single element
-     * @param <E>     the type of the single element
-     * @return a new stream containing exactly one element
+     * @param <E> the type of the elements of this stream
+     * @return a new empty stream containing no elements
      */
-    public static <E> Stream<E> singleton(final E element) {
-        return new SingletonStream<E>(element);
+    public static <E> Stream<E> empty() {
+        return new EmptyStream<E>();
     }
 
     /**
@@ -85,6 +76,19 @@ public abstract class Stream<E> implements Iterable<E> {
     public static <E> Stream<E> of(Iterable<E> iterable) {
         return create(iterable);
     }
+
+    /**
+     * Creates a new singleton stream, containing exactly one element
+     *
+     * @param element the single element
+     * @param <E>     the type of the single element
+     * @return a new stream containing exactly one element
+     */
+    public static <E> Stream<E> singleton(final E element) {
+        return new SingletonStream<E>(element);
+    }
+
+    /* Instance methods (alphabetically) */
 
     /**
      * Casts every element of this stream to another class
@@ -168,7 +172,6 @@ public abstract class Stream<E> implements Iterable<E> {
             throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
         return new GroupedStream<K, E>(this, keyMapper);
     }
-
 
     /**
      * Joins the stream using the given delimiter

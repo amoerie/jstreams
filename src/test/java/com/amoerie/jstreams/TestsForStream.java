@@ -38,12 +38,88 @@ public class TestsForStream {
         }
     };
 
+    /* static method tests (alphabetically) */
+
+    public static class TestsForCreate {
+
+        @Test
+        public void shouldReturnAStreamContainingAllTheProvidedElements() {
+            List<String> fruits = Stream.create(new String[]{"Apple", "Pear", "Banana"}).toList();
+            assertThat(fruits, hasItem("Apple"));
+            assertThat(fruits, hasItem("Pear"));
+            assertThat(fruits, hasItem("Banana"));
+        }
+
+        @Test(expected = IllegalArgumentException.class)
+        public void shouldThrowAnIllegalArgumentExceptionIfTheArrayIsNull() {
+            Stream.create((Object[]) null);
+        }
+
+    }
+
+    public static class TestsForEmpty {
+
+        @Test
+        public void shouldCreateEmptyStream() {
+            assertThat(Stream.<Apple>empty().toList(), is(Collections.<Apple>emptyList()));
+        }
+
+        @Test(expected = NoSuchElementException.class)
+        public void iteratorShouldThrowNoSuchElementException() {
+            Stream.<String>empty().iterator().next();
+        }
+
+        @Test
+        public void iteratorShouldNotHaveElements() {
+            assertFalse(Stream.<String>empty().iterator().hasNext());
+        }
+
+    }
+
+    public static class TestsForSingleton {
+        @Test
+        public void shouldCreateStreamWithOneElement() {
+            Apple element = new Apple();
+            assertThat(Stream.singleton(element).toSet(), is(Collections.singleton(element)));
+        }
+
+        @Test
+        public void iteratorShouldReturnSingleItemOnTheFirstNext() {
+            Iterator<Apple> iterator = Stream.singleton(new Apple()).iterator();
+            assertThat(iterator.next(), is(notNullValue()));
+        }
+
+        @Test
+        public void iteratorShouldReturnTrueForTheFirstHasNext() {
+            Iterator<Apple> iterator = Stream.singleton(new Apple()).iterator();
+            assertTrue(iterator.hasNext());
+        }
+
+        @Test(expected = NoSuchElementException.class)
+        public void iteratorShouldThrowNoSuchElementExceptionOnTheSecondNext() {
+            Iterator<String> iterator = Stream.<String>empty().iterator();
+            iterator.next();
+            iterator.next();
+        }
+
+        @Test
+        public void iteratorShouldReturnFalseOnTheSecondHasNext() {
+            Iterator<Apple> iterator = Stream.singleton(new Apple()).iterator();
+            assertTrue(iterator.hasNext());
+            iterator.next();
+            assertFalse(iterator.hasNext());
+        }
+
+    }
+
+    /* instance method tests (alphabetically) */
+
     public static class TestsForCast {
         @Test
         public void shouldCastEveryFruitToAnApple() {
             TestModels.Fruit[] fruits = {new Apple(), new Apple()};
             FruitBasket fruitBasket = makeFruitBasket(fruits);
-            Iterable<Apple> apples = Stream.create(fruitBasket.getFruitList()).cast(Apple.class).toList();
+            Iterable<Apple> apples = fruitBasket.asStream().cast(Apple.class).toList();
             assertThat(apples, everyItem(CoreMatchers.<Apple>instanceOf(Apple.class)));
         }
 
@@ -62,8 +138,8 @@ public class TestsForStream {
             Apple apple1 = new Apple();
             Apple apple2 = new Apple();
             Fruit pear = new Fruit("pear");
-            Stream<Fruit> apples = Stream.create(makeFruitBasket(apple1, apple2).getFruitList());
-            Stream<Fruit> otherFruits = Stream.create(makeFruitBasket(pear).getFruitList());
+            Stream<Fruit> apples = makeFruitBasket(apple1, apple2).asStream();
+            Stream<Fruit> otherFruits = makeFruitBasket(pear).asStream();
             Stream<Fruit> allFruits = apples.concat(otherFruits);
             List<Fruit> allFruitsList = allFruits.toList();
             assertThat(allFruitsList.size(), is(3));
@@ -80,23 +156,6 @@ public class TestsForStream {
                     .toSet();
             assertThat(singleton, is(Collections.singleton("abc")));
 
-        }
-
-    }
-
-    public static class TestsForCreate {
-
-        @Test
-        public void shouldReturnAStreamContainingAllTheProvidedElements() {
-            List<String> fruits = Stream.create(new String[]{"Apple", "Pear", "Banana"}).toList();
-            assertThat(fruits, hasItem("Apple"));
-            assertThat(fruits, hasItem("Pear"));
-            assertThat(fruits, hasItem("Banana"));
-        }
-
-        @Test(expected = IllegalArgumentException.class)
-        public void shouldThrowAnIllegalArgumentExceptionIfTheArrayIsNull() {
-            Stream.create((Object[]) null);
         }
 
     }
@@ -127,25 +186,6 @@ public class TestsForStream {
 
     }
 
-    public static class TestsForEmpty {
-
-        @Test
-        public void shouldCreateEmptyStream() {
-            assertThat(Stream.<Apple>empty().toList(), is(Collections.<Apple>emptyList()));
-        }
-
-        @Test(expected = NoSuchElementException.class)
-        public void iteratorShouldThrowNoSuchElementException() {
-            Stream.<String>empty().iterator().next();
-        }
-
-        @Test
-        public void iteratorShouldNotHaveElements() {
-            assertFalse(Stream.<String>empty().iterator().hasNext());
-        }
-
-    }
-
     public static class TestsForGroupBy {
 
         @Test
@@ -166,7 +206,7 @@ public class TestsForStream {
             Fruit pear = new Fruit("pear");
             Fruit nothing = new Fruit(null);
             FruitBasket fruitBasket = makeFruitBasket(apple, pear, nothing);
-            List<Group<String, Fruit>> groups = Stream.create(fruitBasket.getFruitList())
+            List<Group<String, Fruit>> groups = fruitBasket.asStream()
                     .groupBy(getFruitName).toList();
             assertThat(groups.size(), is(3));
             assertThat(groups.get(0).getKey(), is("apple"));
@@ -183,7 +223,7 @@ public class TestsForStream {
             Fruit secondApple = new Fruit("apple");
             Fruit banana = new Fruit("banana");
             FruitBasket fruitBasket = makeFruitBasket(apple, secondApple, banana);
-            List<Group<String, Fruit>> groups = Stream.create(fruitBasket.getFruitList())
+            List<Group<String, Fruit>> groups = fruitBasket.asStream()
                     .groupBy(getFruitName).toList();
 
             assertThat(groups.size(), is(2));
@@ -302,7 +342,7 @@ public class TestsForStream {
                     .flatMap(new Mapper<FruitBasket, Stream<Fruit>>() {
                         @Override
                         public Stream<Fruit> map(FruitBasket fruitBasket) {
-                            return Stream.create(fruitBasket.getFruitList());
+                            return fruitBasket.asStream();
                         }
                     })
                     .toList();
@@ -315,10 +355,10 @@ public class TestsForStream {
             List<Fruit> allFruits = Stream.create(allBaskets).flatMap(new Mapper<FruitBasket, Stream<Fruit>>() {
                 @Override
                 public Stream<Fruit> map(FruitBasket fruitBasket) {
-                    return Stream.create(fruitBasket.getFruitList());
+                    return fruitBasket.asStream();
                 }
             }).toList();
-            assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear")).getFruitList()));
+            assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear")).asList()));
         }
 
         @Test
@@ -329,10 +369,10 @@ public class TestsForStream {
             List<Fruit> allFruits = Stream.create(allBaskets).flatMap(new Mapper<FruitBasket, Stream<Fruit>>() {
                 @Override
                 public Stream<Fruit> map(FruitBasket fruitBasket) {
-                    return Stream.create(fruitBasket.getFruitList());
+                    return fruitBasket.asStream();
                 }
             }).toList();
-            assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("strawberries")).getFruitList()));
+            assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("strawberries")).asList()));
         }
 
         @Test
@@ -344,10 +384,37 @@ public class TestsForStream {
             List<Fruit> allFruits = Stream.create(allBaskets).flatMap(new Mapper<FruitBasket, Stream<Fruit>>() {
                 @Override
                 public Stream<Fruit> map(FruitBasket fruitBasket) {
-                    return Stream.create(fruitBasket.getFruitList());
+                    return fruitBasket.asStream();
                 }
             }).toList();
-            assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("strawberries")).getFruitList()));
+            assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("strawberries")).asList()));
+        }
+    }
+
+    public static class TestsForJoin {
+
+        @Test
+        public void shouldBeEmpyOnEmptyStream() {
+            String joined = Stream.of().join(",");
+            assertTrue(joined.isEmpty());
+        }
+
+        @Test
+        public void shouldNotInsertDelimiterOnSingletonStream() {
+            String joined = Stream.of("xyz").join(".");
+            assertThat(joined, is("xyz"));
+        }
+
+        @Test
+        public void shouldSupportEmptyDelimiter() {
+            String joined = Stream.of("ab", "cd", "efg").join("");
+            assertThat(joined, is("abcdefg"));
+        }
+
+        @Test
+        public void shouldInsertDelimiter() {
+            String joined = new InfiniteStream<Integer>(1).take(5).join(",");
+            assertThat(joined, is("1,1,1,1,1"));
         }
     }
 
@@ -360,7 +427,7 @@ public class TestsForStream {
 
         @Test
         public void shouldTakeTheLastElementIfTheStreamIsNotEmpty() {
-            assertThat(Stream.create(new String[] { "Johnny", "Freddy", "Ringo"}).last(), is("Ringo"));
+            assertThat(Stream.create(new String[]{"Johnny", "Freddy", "Ringo"}).last(), is("Ringo"));
         }
 
     }
@@ -388,7 +455,7 @@ public class TestsForStream {
 
         @Test
         public void aFilledFruitBasketShouldMapToTheirNames() {
-            List<String> fruitNames = Stream.create(makeFruitBasket(new Fruit("apple"), new Fruit("pear")).getFruitList())
+            List<String> fruitNames = makeFruitBasket(new Fruit("apple"), new Fruit("pear")).asStream()
                     .map(getFruitName)
                     .toList();
             assertThat(fruitNames, is(Arrays.asList(new String[]{"apple", "pear"})));
@@ -407,44 +474,8 @@ public class TestsForStream {
         public void shouldCorrectlyFilterOutApplesFromTheFruitBasket() {
             Apple apple = new Apple();
             FruitBasket assortedFruits = makeFruitBasket(new Fruit("banana"), apple, new Fruit("pear"));
-            Stream<Apple> apples = Stream.create(assortedFruits.getFruitList()).ofClass(Apple.class);
+            Stream<Apple> apples = assortedFruits.asStream().ofClass(Apple.class);
             assertThat(apples.toList(), is(Stream.singleton(apple).toList()));
-        }
-
-    }
-
-    public static class TestsForSingleton {
-        @Test
-        public void shouldCreateStreamWithOneElement() {
-            Apple element = new Apple();
-            assertThat(Stream.singleton(element).toSet(), is(Collections.singleton(element)));
-        }
-
-        @Test
-        public void iteratorShouldReturnSingleItemOnTheFirstNext() {
-            Iterator<Apple> iterator = Stream.singleton(new Apple()).iterator();
-            assertThat(iterator.next(), is(notNullValue()));
-        }
-
-        @Test
-        public void iteratorShouldReturnTrueForTheFirstHasNext() {
-            Iterator<Apple> iterator = Stream.singleton(new Apple()).iterator();
-            assertTrue(iterator.hasNext());
-        }
-
-        @Test(expected = NoSuchElementException.class)
-        public void iteratorShouldThrowNoSuchElementExceptionOnTheSecondNext() {
-            Iterator<String> iterator = Stream.<String>empty().iterator();
-            iterator.next();
-            iterator.next();
-        }
-
-        @Test
-        public void iteratorShouldReturnFalseOnTheSecondHasNext() {
-            Iterator<Apple> iterator = Stream.singleton(new Apple()).iterator();
-            assertTrue(iterator.hasNext());
-            iterator.next();
-            assertFalse(iterator.hasNext());
         }
 
     }
@@ -454,7 +485,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnTrueIfAPearIfPresent() {
             FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("pineapple"));
-            assertTrue(Stream.create(fruits.getFruitList()).some(new Filter<Fruit>() {
+            assertTrue(fruits.asStream().some(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
                     return fruit.getName().equals("pear");
@@ -465,7 +496,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnFalseIfNoPearIfPresent() {
             FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("banana"));
-            assertFalse(Stream.create(fruits.getFruitList()).some(new Filter<Fruit>() {
+            assertFalse(fruits.asStream().some(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
                     return fruit.getName().equals("pear");
@@ -578,31 +609,4 @@ public class TestsForStream {
             assertThat(names, is(Arrays.asList("xyz")));
         }
     }
-
-	public static class TestsForJoin {
-
-		@Test
-		public void shouldBeEmpyOnEmptyStream() {
-			String joined = Stream.of().join(",");
-			assertTrue(joined.isEmpty());
-		}
-
-		@Test
-		public void shouldNotInsertDelimiterOnSingletonStream() {
-			String joined = Stream.of("xyz").join(".");
-			assertThat(joined, is("xyz"));
-		}
-
-		@Test
-		public void shouldSupportEmptyDelimiter() {
-			String joined = Stream.of("ab", "cd", "efg").join("");
-			assertThat(joined, is("abcdefg"));
-		}
-
-		@Test
-		public void shouldInsertDelimiter() {
-			String joined = new InfiniteStream<Integer>(1).take(5).join(",");
-			assertThat(joined, is("1,1,1,1,1"));
-		}
-	}
 }

@@ -53,8 +53,12 @@ class TestModels {
             this.fruitList = fruitList;
         }
 
-        public List<Fruit> getFruitList() {
+        public List<Fruit> asList() {
             return fruitList;
+        }
+
+        public Stream<Fruit> asStream() {
+            return Stream.create(fruitList);
         }
 
         @Override
