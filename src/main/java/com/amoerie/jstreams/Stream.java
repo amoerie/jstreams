@@ -29,28 +29,28 @@ public abstract class Stream<E> implements Iterable<E> {
     /**
      * Creates a new stream from the provided array of elements
      *
-     * @param array the array of elements
+     * @param elements the array of elements
      * @param <E>   the type of the elements
      * @return a new stream containing the elements of the array
      */
-    public static <E> Stream<E> create(final E[] array) {
-        if (array == null)
+    public static <E> Stream<E> create(final E ... elements) {
+        if (elements == null)
             throw new IllegalArgumentException("Unable to create a stream from this array because it is null!");
-        return create(Arrays.asList(array));
+        return create(Arrays.asList(elements));
     }
 
     /**
      * Creates a new stream from the provided iterable
      * This is a lazy operation, it does not consume the iterable until a greedy operation is called, such as toList()
      *
-     * @param iterable an iterable containing elements
+     * @param elements an iterable containing elements
      * @param <E>      the type of an element
      * @return a new stream containing the elements of the iterable
      */
-    public static <E> Stream<E> create(final Iterable<E> iterable) {
-        if (iterable == null)
+    public static <E> Stream<E> create(final Iterable<E> elements) {
+        if (elements == null)
             throw new IllegalArgumentException("Unable to create a stream from this iterable because it is null!");
-        return new IterableStream<E>(iterable);
+        return new IterableStream<E>(elements);
     }
 
     /**
@@ -65,16 +65,24 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Alias for {@link #create(E[])}
+
+     * @param elements the array of elements
+     * @param <E>   the type of the elements
+     * @return a new stream containing the elements of the array
      */
-    public static <E> Stream<E> of(E... elements) {
+    public static <E> Stream<E> of(final E ... elements) {
         return create(elements);
     }
 
     /**
      * Alias for {@link #create(Iterable)}
+     *
+     * @param elements an iterable containing elements
+     * @param <E>      the type of an element
+     * @return a new stream containing the elements of the iterable
      */
-    public static <E> Stream<E> of(Iterable<E> iterable) {
-        return create(iterable);
+    public static <E> Stream<E> of(Iterable<E> elements) {
+        return create(elements);
     }
 
     /**

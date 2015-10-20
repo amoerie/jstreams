@@ -55,6 +55,12 @@ public class TestsForStream {
             Stream.create((Object[]) null);
         }
 
+        @Test
+        public void shouldWorkWithAVariableAmountOfArguments() {
+            Stream<String> strings = Stream.create("abc", "def");
+            assertThat(strings.toList(), is(Arrays.asList("abc", "def")));
+        }
+
     }
 
     public static class TestsForEmpty {
@@ -395,19 +401,19 @@ public class TestsForStream {
 
         @Test
         public void shouldBeEmpyOnEmptyStream() {
-            String joined = Stream.of().join(",");
+            String joined = Stream.empty().join(",");
             assertTrue(joined.isEmpty());
         }
 
         @Test
         public void shouldNotInsertDelimiterOnSingletonStream() {
-            String joined = Stream.of("xyz").join(".");
+            String joined = Stream.singleton("xyz").join(".");
             assertThat(joined, is("xyz"));
         }
 
         @Test
         public void shouldSupportEmptyDelimiter() {
-            String joined = Stream.of("ab", "cd", "efg").join("");
+            String joined = Stream.of(new String[] {"ab", "cd", "efg" }).join("");
             assertThat(joined, is("abcdefg"));
         }
 
