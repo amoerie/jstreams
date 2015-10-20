@@ -183,9 +183,16 @@ public abstract class Stream<E> implements Iterable<E> {
      * Reduces this stream to a single value by repeatedly applying the same reduction operator to the
      * current value and the next element.
      * For example, to reduce a stream of integers to a sum:
-     * numbers.reduce((sum, number) => sum + number, 0)
-     *
+     * <pre>
+     * {@code int sum = numbers.reduce(new Reducer<Integer, Integer>() {
+     *          public Integer reduce(Integer sum, Integer number) {
+     *              return sum + number;
+     *          }
+     *     }, 0)
+     * }
+     * </pre>
      * @param reducer the reduction function that turns the current value and the next element into the next value
+     * @param initialValue the initial value to start from. This is also the value that will be returned when the stream is empty.
      * @param <R>     the type of the result of the reduced stream
      * @return the final value after reducing every element
      */
@@ -196,6 +203,7 @@ public abstract class Stream<E> implements Iterable<E> {
         for (E e : this) {
             accumulator = reducer.reduce(accumulator, e);
         }
+
         return accumulator;
     }
 
