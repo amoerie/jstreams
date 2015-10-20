@@ -1,10 +1,16 @@
 package com.amoerie.jstreams;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 import com.amoerie.jstreams.functions.Reducer;
-
-import java.util.*;
 
 /**
  * Represents a collection of elements that are not known at construction time
@@ -85,9 +91,12 @@ public abstract class Stream<E> implements Iterable<E> {
      * @param other the other stream to concatenate with
      * @return a new stream containing all the elements of this stream and the other stream
      */
-    public Stream<E> concat(final Stream<E> other) {
-        return new FlatStream<E>(create(Arrays.asList(this, other)));
-    }
+	public Stream<E> concat(final Stream<E> other) {
+		List<Stream<E>> both = new ArrayList<Stream<E>>(2);
+		both.add(this);
+		both.add(other);
+		return new FlatStream<E>(create(both));
+	}
 
     /**
      * Filters this stream to only have unique elements.
