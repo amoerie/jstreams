@@ -1,20 +1,33 @@
 package com.amoerie.jstreams;
 
-import com.amoerie.jstreams.TestModels.Apple;
-import com.amoerie.jstreams.TestModels.Fruit;
-import com.amoerie.jstreams.TestModels.FruitBasket;
-import com.amoerie.jstreams.functions.Filter;
-import com.amoerie.jstreams.functions.Mapper;
+import static com.amoerie.jstreams.TestModels.makeFruitBasket;
+import static org.hamcrest.CoreMatchers.everyItem;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-import java.util.*;
-
-import static com.amoerie.jstreams.TestModels.makeFruitBasket;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import com.amoerie.jstreams.TestModels.Apple;
+import com.amoerie.jstreams.TestModels.Fruit;
+import com.amoerie.jstreams.TestModels.FruitBasket;
+import com.amoerie.jstreams.functions.Filter;
+import com.amoerie.jstreams.functions.Mapper;
 
 @RunWith(Enclosed.class)
 public class TestsForStream {
@@ -565,4 +578,31 @@ public class TestsForStream {
             assertThat(names, is(Arrays.asList("xyz")));
         }
     }
+
+	public static class TestsForJoin {
+
+		@Test
+		public void shouldBeEmpyOnEmptyStream() {
+			String joined = Stream.of().join(",");
+			assertTrue(joined.isEmpty());
+		}
+
+		@Test
+		public void shouldNotInsertDelimiterOnSingletonStream() {
+			String joined = Stream.of("xyz").join(".");
+			assertThat(joined, is("xyz"));
+		}
+
+		@Test
+		public void shouldSupportEmptyDelimiter() {
+			String joined = Stream.of("ab", "cd", "efg").join("");
+			assertThat(joined, is("abcdefg"));
+		}
+
+		@Test
+		public void shouldInsertDelimiter() {
+			String joined = new InfiniteStream<Integer>(1).take(5).join(",");
+			assertThat(joined, is("1,1,1,1,1"));
+		}
+	}
 }
