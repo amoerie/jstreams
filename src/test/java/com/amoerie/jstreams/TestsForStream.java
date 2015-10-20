@@ -120,6 +120,53 @@ public class TestsForStream {
 
     /* instance method tests (alphabetically) */
 
+    public static class TestsForAny {
+        @Test
+        public void shouldReturnTrueIfAPearIfPresent() {
+            FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("pineapple"));
+            assertTrue(fruits.asStream().some(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().equals("pear");
+                }
+            }));
+        }
+
+        @Test
+        public void shouldReturnFalseIfNoPearIfPresent() {
+            FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("banana"));
+            assertFalse(fruits.asStream().some(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().equals("pear");
+                }
+            }));
+        }
+
+        @Test
+        public void shouldReturnTrueIfTheListIsInfinitelyLongButThePearIsPresent() {
+            Stream<Fruit> infiniteFruits // solving world hunger, one pear at a time
+                    = new InfiniteStream<Fruit>(new Fruit("pear"));
+            assertTrue(infiniteFruits.some(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().equals("pear");
+                }
+            }));
+        }
+
+        @Test
+        public void shouldReturnTrueIfThePredicateChecksForNull() {
+            Stream<String> strings = Stream.create("abc", null, "def");
+            assertThat(strings.some(new Filter<String>() {
+                @Override
+                public boolean apply(String s) {
+                    return s == null;
+                }
+            }), is(true));
+        }
+    }
+
     public static class TestsForCast {
         @Test
         public void shouldCastEveryFruitToAnApple() {
@@ -450,6 +497,21 @@ public class TestsForStream {
         }
     }
 
+    public static class TestsForLimit {
+        @Test
+        public void shouldReturnEmptyStreamIfNumberIs0() {
+            Set<String> strings = Stream.singleton("abc").limit(0).toSet();
+            assertThat(strings, is(Collections.<String>emptySet()));
+        }
+
+        @Test
+        public void shouldTake3ElementsWhenTheNumberIs3() {
+            List<String> actualStrings = Stream.create(Arrays.asList("one", "two", "three", "four", "five")).limit(3).toList();
+            List<String> expectedStrings = Arrays.asList("one", "two", "three");
+            assertThat(actualStrings, is(expectedStrings));
+        }
+    }
+
     public static class TestsForMap {
         @Test
         public void anEmptyFruitBasketShouldMapToNoFruitNames() {
@@ -487,7 +549,6 @@ public class TestsForStream {
     }
 
     public static class TestsForSome {
-
         @Test
         public void shouldReturnTrueIfAPearIfPresent() {
             FruitBasket fruits = makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("pineapple"));
@@ -522,6 +583,16 @@ public class TestsForStream {
             }));
         }
 
+        @Test
+        public void shouldReturnTrueIfThePredicateChecksForNull() {
+            Stream<String> strings = Stream.create("abc", null, "def");
+            assertThat(strings.some(new Filter<String>() {
+                @Override
+                public boolean apply(String s) {
+                    return s == null;
+                }
+            }), is(true));
+        }
     }
 
     public static class TestsForSortBy {

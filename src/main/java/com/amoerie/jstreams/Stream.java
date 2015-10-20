@@ -99,6 +99,16 @@ public abstract class Stream<E> implements Iterable<E> {
     /* Instance methods (alphabetically) */
 
     /**
+     * Alias for {@link #some(Filter)}
+     *
+     * @param filter the filter that returns true or false for any given element
+     * @return true if one of the elements satisfied the predicate or false otherwise
+     */
+    public boolean any(final Filter<E> filter) {
+        return some(filter);
+    }
+
+    /**
      * Casts every element of this stream to another class
      *
      * @param clazz the class to cast to
@@ -225,6 +235,16 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Alias for {@link #take(int)}
+     *
+     * @param number the number of items to take
+     * @return a new stream containing only the first n elements of this stream
+     */
+    public Stream<E> limit(final int number) {
+        return take(number);
+    }
+
+    /**
      * Filters out the elements that are of a certain class
      *
      * @param clazz the class that should be filtered out
@@ -302,7 +322,7 @@ public abstract class Stream<E> implements Iterable<E> {
     public boolean some(final Filter<E> filter) {
         if (filter == null)
             throw new IllegalArgumentException("Unable to determine if some element satisfies this filter because the filter is null!");
-        return this.filter(filter).first() != null;
+        return this.filter(filter).iterator().hasNext();
     }
 
     /**
