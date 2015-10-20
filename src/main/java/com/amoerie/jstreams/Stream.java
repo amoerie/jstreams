@@ -1,10 +1,16 @@
 package com.amoerie.jstreams;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 import com.amoerie.jstreams.functions.Reducer;
-
-import java.util.*;
 
 /**
  * Represents a collection of elements that are not known at construction time
@@ -65,6 +71,20 @@ public abstract class Stream<E> implements Iterable<E> {
             throw new IllegalArgumentException("Unable to create a stream from this iterable because it is null!");
         return new IterableStream<E>(iterable);
     }
+
+    /**
+	 * Same as {@link #create(E[])}
+	 */
+	public static <E> Stream<E> of(E... elements) {
+		return create(elements);
+	}
+
+	/**
+	 * Same as {@link #create(Iterable)}
+	 */
+	public static <E> Stream<E> of(Iterable<E> iterable) {
+		return create(iterable);
+	}
 
     /**
      * Casts every element of this stream to another class
@@ -343,4 +363,21 @@ public abstract class Stream<E> implements Iterable<E> {
         if(other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
         return new WithoutStream<E>(this, other);
     }
+
+	/**
+	 * Joins the stream using given delimiter
+	 * 
+	 * @param delimiter
+	 *            delimiter to be inserted between stream elements
+	 */
+	public String join(String delimiter) {
+		String sep = "";
+		StringBuilder buffer = new StringBuilder();
+		for (E element : this) {
+			buffer.append(sep);
+			buffer.append(String.valueOf(element));
+			sep = delimiter;
+		}
+		return buffer.toString();
+	}
 }
