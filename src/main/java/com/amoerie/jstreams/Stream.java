@@ -64,7 +64,7 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-     * Alias for {@link #create(E[])}
+     * Alias for {@link #create(Object[])}
 
      * @param elements the array of elements
      * @param <E>   the type of the elements
@@ -185,6 +185,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * Joins the stream using the given delimiter
      *
      * @param delimiter the delimiter to be inserted between each element
+     * @return a string containing all of the elements with the given delimiter between each element
      */
     public String join(final String delimiter) {
         if (delimiter == null)

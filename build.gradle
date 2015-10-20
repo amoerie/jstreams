@@ -3,7 +3,10 @@ version '1.0'
 
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'signing'
+
+if(project.file('gradle.properties').exists()) {
+    apply plugin: 'signing'
+}
 
 project.sourceCompatibility = 1.6
 project.targetCompatibility = 1.6
@@ -30,48 +33,50 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-signing {
-    sign configurations.archives
-}
+if(project.file('gradle.properties').exists()) {
+    signing {
+        sign configurations.archives
+    }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'JStreams'
-                packaging 'jar'
-                // optionally artifactId can be defined here
-                description 'Contains Java 6 compatible FP streams that are immutable, lazy and chainable.'
-                url 'https://github.com/amoerie/jstreams'
-
-                scm {
-                    connection 'scm:git:git@github.com:amoerie/jstreams.git'
-                    developerConnection 'scm:git:git@github.com:amoerie/jstreams.git'
-                    url 'git@github.com:amoerie/jstreams.git'
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
                 }
 
-                licenses {
-                    license {
-                        name 'MIT License'
-                        url 'http://www.opensource.org/licenses/mit-license.php'
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name 'JStreams'
+                    packaging 'jar'
+                    // optionally artifactId can be defined here
+                    description 'Contains Java 6 compatible FP streams that are immutable, lazy and chainable.'
+                    url 'https://github.com/amoerie/jstreams'
+
+                    scm {
+                        connection 'scm:git:git@github.com:amoerie/jstreams.git'
+                        developerConnection 'scm:git:git@github.com:amoerie/jstreams.git'
+                        url 'git@github.com:amoerie/jstreams.git'
                     }
-                }
 
-                developers {
-                    developer {
-                        id 'amoerie'
-                        name 'Alexander Moerman'
-                        email 'alexander.moerman@gmail.com'
+                    licenses {
+                        license {
+                            name 'MIT License'
+                            url 'http://www.opensource.org/licenses/mit-license.php'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'amoerie'
+                            name 'Alexander Moerman'
+                            email 'alexander.moerman@gmail.com'
+                        }
                     }
                 }
             }
