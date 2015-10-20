@@ -8,5 +8,9 @@ package com.amoerie.jstreams;
  * @param <E> the type of the elements
  */
 public abstract class Group<TKey, E> extends Stream<E> {
+    /**
+     * Gets the key of this group.
+     * @return
+     */
     public abstract TKey getKey();
 }

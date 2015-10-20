@@ -35,17 +35,6 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-     * Creates a new singleton stream, containing exactly one element
-     *
-     * @param element the single element
-     * @param <E>     the type of the single element
-     * @return a new stream containing exactly one element
-     */
-    public static <E> Stream<E> singleton(final E element) {
-        return new SingletonStream<E>(element);
-    }
-
-    /**
      * Creates a new stream from the provided array of elements
      *
      * @param array the array of elements
@@ -67,24 +56,35 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new stream containing the elements of the iterable
      */
     public static <E> Stream<E> create(final Iterable<E> iterable) {
-        if(iterable == null)
+        if (iterable == null)
             throw new IllegalArgumentException("Unable to create a stream from this iterable because it is null!");
         return new IterableStream<E>(iterable);
     }
 
     /**
-	 * Same as {@link #create(E[])}
-	 */
-	public static <E> Stream<E> of(E... elements) {
-		return create(elements);
-	}
+     * Creates a new singleton stream, containing exactly one element
+     *
+     * @param element the single element
+     * @param <E>     the type of the single element
+     * @return a new stream containing exactly one element
+     */
+    public static <E> Stream<E> singleton(final E element) {
+        return new SingletonStream<E>(element);
+    }
 
-	/**
-	 * Same as {@link #create(Iterable)}
-	 */
-	public static <E> Stream<E> of(Iterable<E> iterable) {
-		return create(iterable);
-	}
+    /**
+     * Alias for {@link #create(E[])}
+     */
+    public static <E> Stream<E> of(E... elements) {
+        return create(elements);
+    }
+
+    /**
+     * Alias for {@link #create(Iterable)}
+     */
+    public static <E> Stream<E> of(Iterable<E> iterable) {
+        return create(iterable);
+    }
 
     /**
      * Casts every element of this stream to another class
@@ -105,15 +105,16 @@ public abstract class Stream<E> implements Iterable<E> {
      * @param other the other stream to concatenate with
      * @return a new stream containing all the elements of this stream and the other stream
      */
-	public Stream<E> concat(final Stream<E> other) {
-		List<Stream<E>> both = new ArrayList<Stream<E>>(2);
-		both.add(this);
-		both.add(other);
-		return new FlatStream<E>(create(both));
-	}
+    public Stream<E> concat(final Stream<E> other) {
+        return new FlatStream<E>(create(new ArrayList<Stream<E>>(2) {{
+            add(Stream.this);
+            add(other);
+        }}));
+    }
 
     /**
      * Filters this stream to only have unique elements.
+     *
      * @return a new stream containing only unique elements.
      */
     public Stream<E> distinct() {
@@ -159,13 +160,30 @@ public abstract class Stream<E> implements Iterable<E> {
      * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
      *
      * @param keyMapper a function that returns the grouping key for a given element
-     * @param <K>         the type of the key
+     * @param <K>       the type of the key
      * @return a stream containing groups as its elements
      */
     public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper) {
         if (keyMapper == null)
             throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
         return new GroupedStream<K, E>(this, keyMapper);
+    }
+
+
+    /**
+     * Joins the stream using the given delimiter
+     *
+     * @param delimiter the delimiter to be inserted between each element
+     */
+    public String join(final String delimiter) {
+        if (delimiter == null)
+            throw new IllegalArgumentException("Unable to join this stream because the provided delimiter is null");
+        return this.reduce(new Reducer<E, StringBuilder>() {
+            @Override
+            public StringBuilder reduce(StringBuilder s, E e) {
+                return ( s.length() == 0 ? s : s.append(delimiter) ).append(String.valueOf(e));
+            }
+        }, new StringBuilder()).toString();
     }
 
     /**
@@ -235,9 +253,10 @@ public abstract class Stream<E> implements Iterable<E> {
      *     }, 0)
      * }
      * </pre>
-     * @param reducer the reduction function that turns the current value and the next element into the next value
+     *
+     * @param reducer      the reduction function that turns the current value and the next element into the next value
      * @param initialValue the initial value to start from. This is also the value that will be returned when the stream is empty.
-     * @param <R>     the type of the result of the reduced stream
+     * @param <R>          the type of the result of the reduced stream
      * @return the final value after reducing every element
      */
     public <R> R reduce(final Reducer<E, R> reducer, final R initialValue) {
@@ -247,7 +266,6 @@ public abstract class Stream<E> implements Iterable<E> {
         for (E e : this) {
             accumulator = reducer.reduce(accumulator, e);
         }
-
         return accumulator;
     }
 
@@ -265,11 +283,12 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Determines whether any of the elements in this stream satisfy the given predicate
+     *
      * @param filter the filter that returns true or false for any given element
      * @return true if one of the elements satisfied the predicate or false otherwise
      */
     public boolean some(final Filter<E> filter) {
-        if(filter == null)
+        if (filter == null)
             throw new IllegalArgumentException("Unable to determine if some element satisfies this filter because the filter is null!");
         return this.filter(filter).first() != null;
     }
@@ -291,7 +310,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * Sorts this stream based on a property of each element, provided that that property implements Comparable.
      *
      * @param mapper the function that extracts a value from an element so it can be used as the basis for the comparison
-     * @param <T>              the type of the property that is the basis for the comparison
+     * @param <T>    the type of the property that is the basis for the comparison
      * @return a new stream containing all elements of this stream sorted by the given property
      */
     public <T extends Comparable<T>> Stream<E> sortBy(final Mapper<E, T> mapper) {
@@ -307,8 +326,9 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Sorts this stream descendingly based on a mapped value of each element, provided that that value implements Comparable.
+     *
      * @param mapper the function that extracts a value from an element so it can be used as the basis for the comparison
-     * @param <T>              the type of the property that is the basis for the comparison
+     * @param <T>    the type of the property that is the basis for the comparison
      * @return a new stream containing all elements of this stream sorted by the given property
      */
     public <T extends Comparable<T>> Stream<E> sortByDescending(final Mapper<E, T> mapper) {
@@ -367,28 +387,12 @@ public abstract class Stream<E> implements Iterable<E> {
     /**
      * Filters out elements from this stream based on the elements from another.
      * Only elements that are NOT in the other stream are allowed to pass through.
+     *
      * @param other the stream containing elements that are forbidden to pass through
      * @return a new stream containing only elements that cannot be found in the other stream
      */
     public Stream<E> without(final Stream<E> other) {
-        if(other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
+        if (other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
         return new WithoutStream<E>(this, other);
     }
-
-	/**
-	 * Joins the stream using given delimiter
-	 * 
-	 * @param delimiter
-	 *            delimiter to be inserted between stream elements
-	 */
-	public String join(String delimiter) {
-		String sep = "";
-		StringBuilder buffer = new StringBuilder();
-		for (E element : this) {
-			buffer.append(sep);
-			buffer.append(String.valueOf(element));
-			sep = delimiter;
-		}
-		return buffer.toString();
-	}
 }
