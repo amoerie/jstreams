@@ -88,6 +88,32 @@ public class TestsForStream {
 
     }
 
+    public static class TestsForDistinct {
+
+        @Test
+        public void shouldReturnAnEmptyStreamIfTheStreamIsEmpty() {
+            assertThat(Stream.<String>empty().distinct().toList(), is(Collections.<String>emptyList()));
+        }
+
+        @Test
+        public void shouldCorrectlyFilterOutTheDuplicateElements() {
+            List<String> fruits = Arrays.asList("Pear", "Apple", "Banana", "Pear", "Banana", "Pineapple");
+            List<String> distinctFruits = Stream.create(fruits).distinct().toList();
+            List<String> expectedFruits = Arrays.asList("Pear", "Apple", "Banana", "Pineapple");
+            assertThat(distinctFruits, is(expectedFruits));
+        }
+
+        @Test
+        public void shouldCorrectlyDistinctFromAnInfiniteStream() {
+            Stream<String> infiniteFruits = Stream.create(Arrays.asList("Pear", "Apple", "Banana", "Pear", "Banana", "Pineapple"))
+                    .concat(new InfiniteStream<String>("Grape"));
+            List<String> distinctFruits = infiniteFruits.distinct().take(4).toList();
+            List<String> expectedFruits = Arrays.asList("Pear", "Apple", "Banana", "Pineapple");
+            assertThat(distinctFruits, is(expectedFruits));
+        }
+
+    }
+
     public static class TestsForEmpty {
 
         @Test
@@ -202,6 +228,57 @@ public class TestsForStream {
                 }
             }).toList();
             assertThat(fruits, is(Collections.<Fruit>emptyList()));
+        }
+
+        @Test
+        public void callingHasNextMultipleTimesShouldNotSkipElements() {
+            final Iterator<Fruit> fruitIterator = Stream.create(fruitBasket).filter(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().startsWith("p");
+                }
+            }).iterator();
+            assertTrue(fruitIterator.hasNext());
+            assertTrue(fruitIterator.hasNext());
+
+            List<Fruit> fruitList = new IterableStream<Fruit>(new Iterable<Fruit>() {
+                @Override
+                public Iterator<Fruit> iterator() {
+                    return fruitIterator;
+                }
+            }).toList();
+            assertThat(fruitList, is(Arrays.asList(new Fruit[]{
+                    new Fruit("pear"),
+                    new Fruit("pineapple"),
+            })));
+        }
+
+        @Test
+        public void callingNextMultipleTimesShouldNotSkipElements() {
+            final Iterator<Fruit> fruitIterator = Stream.create(fruitBasket).filter(new Filter<Fruit>() {
+                @Override
+                public boolean apply(Fruit fruit) {
+                    return fruit.getName().startsWith("p");
+                }
+            }).iterator();
+            assertThat(fruitIterator.next(), is(new Fruit("pear")));
+            assertThat(fruitIterator.next(), is(new Fruit("pineapple")));
+            assertFalse(fruitIterator.hasNext());
+        }
+
+        @Test
+        public void filteringOnNullsShouldWork() {
+            final Iterator<Fruit> fruitIterator = Stream.create(fruitBasket)
+                    .concat(Stream.singleton((Fruit) null))
+                    .filter(new Filter<Fruit>() {
+                        @Override
+                        public boolean apply(Fruit fruit) {
+                            return fruit == null;
+                        }
+                    })
+                    .iterator();
+            assertThat(fruitIterator.next(), is((Fruit) null));
+            assertFalse(fruitIterator.hasNext());
         }
     }
 
@@ -386,27 +463,7 @@ public class TestsForStream {
         @Test
         public void shouldReturnTrueIfTheListIsInfinitelyLongButThePearIsPresent() {
             Stream<Fruit> infiniteFruits // solving world hunger, one pear at a time
-                    = Stream.create(new Iterable<Fruit>() {
-                @Override
-                public Iterator<Fruit> iterator() {
-                    return new Iterator<Fruit>() {
-                        @Override
-                        public boolean hasNext() {
-                            return true;
-                        }
-
-                        @Override
-                        public Fruit next() {
-                            return new Fruit("pear");
-                        }
-
-                        @Override
-                        public void remove() {
-                            throw new UnsupportedOperationException();
-                        }
-                    };
-                }
-            });
+                    = new InfiniteStream<Fruit>(new Fruit("pear"));
             assertTrue(infiniteFruits.some(new Filter<Fruit>() {
                 @Override
                 public boolean apply(Fruit fruit) {
@@ -494,5 +551,18 @@ public class TestsForStream {
         }
     }
 
+    public static class TestsForWithout {
 
+        @Test
+        public void shouldNotHaveAnyImpactWhenTheStreamToFilterWithIsEmpty() {
+            List<String> names = Stream.create(new String[]{"abc", "def", "xyz"}).without(Stream.<String>empty()).toList();
+            assertThat(names, is(Arrays.asList("abc", "def", "xyz")));
+        }
+
+        @Test
+        public void shouldCorrectlyFilterOutTheNamesFromTheOtherStream() {
+            List<String> names = Stream.create(new String[]{"abc", "def", "xyz"}).without(Stream.create(Arrays.asList("def", "abc"))).toList();
+            assertThat(names, is(Arrays.asList("xyz")));
+        }
+    }
 }

@@ -1,10 +1,16 @@
 package com.amoerie.jstreams;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 import com.amoerie.jstreams.functions.Reducer;
-
-import java.util.*;
 
 /**
  * Represents a collection of elements that are not known at construction time
@@ -85,8 +91,19 @@ public abstract class Stream<E> implements Iterable<E> {
      * @param other the other stream to concatenate with
      * @return a new stream containing all the elements of this stream and the other stream
      */
-    public Stream<E> concat(final Stream<E> other) {
-        return new FlatStream<E>(create(Arrays.asList(this, other)));
+	public Stream<E> concat(final Stream<E> other) {
+		List<Stream<E>> both = new ArrayList<Stream<E>>(2);
+		both.add(this);
+		both.add(other);
+		return new FlatStream<E>(create(both));
+	}
+
+    /**
+     * Filters this stream to only have unique elements.
+     * @return a new stream containing only unique elements.
+     */
+    public Stream<E> distinct() {
+        return new DistinctStream<E>(this);
     }
 
     /**
@@ -122,6 +139,19 @@ public abstract class Stream<E> implements Iterable<E> {
         if (mapper == null)
             throw new IllegalArgumentException("Unable to flatMap this stream because the mapper is null!");
         return new FlatStream<R>(new MappedStream<E, Stream<R>>(this, mapper));
+    }
+
+    /**
+     * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
+     *
+     * @param keyMapper a function that returns the grouping key for a given element
+     * @param <K>         the type of the key
+     * @return a stream containing groups as its elements
+     */
+    public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper) {
+        if (keyMapper == null)
+            throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
+        return new GroupedStream<K, E>(this, keyMapper);
     }
 
     /**
@@ -291,19 +321,6 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-     * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
-     *
-     * @param keyMapper a function that returns the grouping key for a given element
-     * @param <K>         the type of the key
-     * @return a stream containing groups as its elements
-     */
-    public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper) {
-        if (keyMapper == null)
-            throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
-        return new GroupedStream<K, E>(this, keyMapper);
-    }
-
-    /**
      * Turns this stream into a list
      *
      * @return a new list containing all the elements of this stream
@@ -331,5 +348,16 @@ public abstract class Stream<E> implements Iterable<E> {
                 return set;
             }
         }, new HashSet<E>());
+    }
+
+    /**
+     * Filters out elements from this stream based on the elements from another.
+     * Only elements that are NOT in the other stream are allowed to pass through.
+     * @param other the stream containing elements that are forbidden to pass through
+     * @return a new stream containing only elements that cannot be found in the other stream
+     */
+    public Stream<E> without(final Stream<E> other) {
+        if(other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
+        return new WithoutStream<E>(this, other);
     }
 }

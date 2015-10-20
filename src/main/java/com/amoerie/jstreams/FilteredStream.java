@@ -6,48 +6,44 @@ import java.util.NoSuchElementException;
 import com.amoerie.jstreams.functions.Filter;
 
 class FilteredStream<E> extends Stream<E> {
-    private Stream<E> stream;
-    private Filter<E> filter;
+    private final Stream<E> stream;
+    private final Filter<E> filter;
 
-    FilteredStream(Stream<E> stream, Filter<E> filter) {
+    FilteredStream(final Stream<E> stream, final Filter<E> filter) {
         this.stream = stream;
         this.filter = filter;
-    }
-
-    private E getNextFilteredElement(Iterator<E> iterator) {
-        while(iterator.hasNext()) {
-            E next = iterator.next();
-            if(filter.apply(next))
-                return next;
-        }
-        return null;
     }
 
     @Override
     public Iterator<E> iterator() {
         final Iterator<E> iterator = stream.iterator();
         return new Iterator<E>() {
+            private boolean isNextFilteredElementReady;
             private E nextFilteredElement;
+
+            private void prepareNextFilteredElement() {
+                isNextFilteredElementReady = false;
+                while (iterator.hasNext() && !isNextFilteredElementReady) {
+                    E next = iterator.next();
+                    if (filter.apply(next)) {
+                        nextFilteredElement = next;
+                        isNextFilteredElementReady = true;
+                    }
+                }
+            }
 
             @Override
             public boolean hasNext() {
-                if(nextFilteredElement == null) {
-                    nextFilteredElement = getNextFilteredElement(iterator);
-                }
-                return nextFilteredElement != null;
+                if (!isNextFilteredElementReady) prepareNextFilteredElement();
+                return isNextFilteredElementReady;
             }
 
             @Override
             public E next() {
-                if(nextFilteredElement == null) {
-                    nextFilteredElement = getNextFilteredElement(iterator);
-                }
-                if(nextFilteredElement == null) {
-                    throw new NoSuchElementException();
-                }
-                E next = nextFilteredElement;
-                nextFilteredElement = null;
-                return next;
+                if (!isNextFilteredElementReady) prepareNextFilteredElement();
+                if (!isNextFilteredElementReady) throw new NoSuchElementException();
+                isNextFilteredElementReady = false;
+                return nextFilteredElement;
             }
 
             @Override

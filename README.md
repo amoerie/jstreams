@@ -1,5 +1,7 @@
 # JStreams
 
+[![Build Status](https://travis-ci.org/amoerie/jstreams.svg)](https://travis-ci.org/amoerie/jstreams)
+
 Contains Java 6 compatible streams that are immutable, lazy and chainable.
 
 - For the C# developers: This library looks A LOT like Linq To Objects, the only difference being that the method names are more conventional ('filter' instead of 'Where', etc.).
@@ -11,8 +13,9 @@ Contains Java 6 compatible streams that are immutable, lazy and chainable.
 1. Streams are immutable. Once a stream has been created, you cannot change it. The only thing you can do is make new streams starting from that stream. 
 2. Streams are lazy. Enumerating the elements of a stream is always postponed as much as possible. There are some methods which absolutely require iteration, which I call "greedy operators". Some examples of greedy operators are `sortBy`, `length`, `toList` and `last`. Most operators are lazy, these are delayed until a greedy operator is called.
 For example, you can do the following:
-
-      `List<String> firstFiveStrings = Stream.create(infiniteStrings).take(5).toList();`
+```java
+      List<String> firstFiveStrings = Stream.create(infiniteStrings).take(5).toList();
+```
 
 3. Stream operators are chainable, allowing you to do complex things with simple compositions.
 
@@ -27,7 +30,46 @@ This library is explicitly called JStreams to accentuate how it's mostly the sam
 
 ## How do I use this
 
-Right now, all you can do is download the zip from the releases page and manually include it. I have a request pending on the Sonatype central to publish to Maven, I'll update this readme when that happens. 
+You can use Maven! Add this to your `<dependencies>` in your pom.xml:
+
+```xml
+      <dependency>
+            <groupId>com.amoerie</groupId>
+            <artifactId>jstreams</artifactId>
+            <version>1.0</version>
+      </dependency>
+```
+
+Or if you use Gradle, add this to your `build.gradle` file 
+
+```groovy
+    compile 'com.amoerie:jstreams:1.0'
+```
+
+Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
+
+## Pull requests
+
+I am taking pull requests! This library is quite minimal, so I expect there to be times when the API is a bit too limited to satisfy all your needs. 
+
+#### Getting started
+
+1. Import this project into your IDE of choice as a Gradle project. There is no other special setup you need to do.
+
+#### Guidelines 
+
+If you want to make sure your pull request gets accepted, follow these guidelines:
+
+- Follow functional conventions. If you add a method that does not exist in any other language or framework, rethink what you're doing. If it does exist elsewhere, find the name that is most commonly used across languages/frameworks.
+
+- Write at least 3 unit tests covering the empty stream scenario, a "happy case" scenario and an infinite stream scenario (if applicable). See the existing tests. 
+
+- Write javadoc for the public parts of the API.
+ 
+Other tips:
+
+- Try to reuse existing operators. For example, `toList` and `length`are just specialized use cases of `reduce`
+- Try to avoid writing code inside the Stream base class. See the private `FlatStream`, `MappedStream`, ... classes if you need an example.
 
 ## Documentation
 
