@@ -1,4 +1,4 @@
-# JStreams
+# JStreams 1.0
 
 [![Build Status](https://travis-ci.org/amoerie/jstreams.svg)](https://travis-ci.org/amoerie/jstreams)
 
@@ -47,6 +47,10 @@ Or if you use Gradle, add this to your `build.gradle` file
 ```
 
 Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
+
+## Roadmap
+
+- 1.1 will be released end of October 2015, fixing a few bugs, adding a couple of operators such as `distinct`, `toMap` and adding some aliases.
 
 ## Pull requests
 
