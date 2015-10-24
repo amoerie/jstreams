@@ -9,7 +9,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -481,6 +489,12 @@ public class TestsForStream {
             String joined = new InfiniteStream<Integer>(1).take(5).join(",");
             assertThat(joined, is("1,1,1,1,1"));
         }
+
+		@Test
+		public void shouldSupportEmptyStrings() {
+			String joined = Stream.of("", "", "A", "").join(":");
+			assertThat(joined, is("::A:"));
+		}
     }
 
     public static class TestsForLast {
