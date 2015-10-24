@@ -131,7 +131,9 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new stream containing all the elements of this stream and the other stream
      */
     public Stream<E> concat(final Stream<E> other) {
-        return new FlatStream<E>(create(new ArrayList<Stream<E>>(2) {{
+		return new FlatStream<E>(create(new ArrayList<Stream<E>>(2) {
+			private static final long serialVersionUID = -24564403429240129L;
+			{
             add(Stream.this);
             add(other);
         }}));
