@@ -1,17 +1,13 @@
 package com.amoerie.jstreams.functions;
 
 /**
- * Represents any operation returning no result.
- *
- * @param <E>
- *            the type of element this operation can apply to
+ * Represents a consumption operation, returning no result.
+ * @param <E> the type of element this consumer can consume
  */
 public interface Consumer<E> {
 	/**
-	 * Applies this operation to the element.
-	 * 
-	 * @param e
-	 *            the element
+	 * Consumes the next element
+	 * @param e the next element
 	 */
-	void apply(E e);
+	void consume(E e);
 }

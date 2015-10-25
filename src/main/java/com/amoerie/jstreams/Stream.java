@@ -33,10 +33,10 @@ public abstract class Stream<E> implements Iterable<E> {
      * Creates a new stream from the provided array of elements
      *
      * @param elements the array of elements
-     * @param <E>   the type of the elements
+     * @param <E>      the type of the elements
      * @return a new stream containing the elements of the array
      */
-    public static <E> Stream<E> create(final E ... elements) {
+    public static <E> Stream<E> create(final E... elements) {
         if (elements == null)
             throw new IllegalArgumentException("Unable to create a stream from this array because it is null!");
         return create(Arrays.asList(elements));
@@ -68,12 +68,12 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Alias for {@link #create(Object[])}
-
+     *
      * @param elements the array of elements
-     * @param <E>   the type of the elements
+     * @param <E>      the type of the elements
      * @return a new stream containing the elements of the array
      */
-    public static <E> Stream<E> of(final E ... elements) {
+    public static <E> Stream<E> of(final E... elements) {
         return create(elements);
     }
 
@@ -130,13 +130,9 @@ public abstract class Stream<E> implements Iterable<E> {
      * @param other the other stream to concatenate with
      * @return a new stream containing all the elements of this stream and the other stream
      */
+    @SuppressWarnings("unchecked")
     public Stream<E> concat(final Stream<E> other) {
-		return new FlatStream<E>(create(new ArrayList<Stream<E>>(2) {
-			private static final long serialVersionUID = -24564403429240129L;
-			{
-            add(Stream.this);
-            add(other);
-        }}));
+        return new FlatStream<E>(create(Stream.this, other));
     }
 
     /**
@@ -171,19 +167,17 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
-	 * Executes given operation on every element of this stream, in the order of
-	 * iteration
-	 * 
-	 * @param consumer
-	 *            the function to be executed on elements of the stream
-	 */
-	public void forEach(Consumer<E> consumer) {
-		if (consumer == null)
-			throw new IllegalArgumentException("Unable to apply forEach because the consumer is null!");
-		for (E e : this) {
-			consumer.apply(e);
-		}
-	}
+     * Iterates over all the elements of this stream and feeds them one by one to the provided {@code consumer}
+     *
+     * @param consumer the function to be executed for each element of the stream
+     */
+    public void forEach(Consumer<E> consumer) {
+        if (consumer == null)
+            throw new IllegalArgumentException("Unable to apply forEach because the consumer is null!");
+        for (E e : this) {
+            consumer.consume(e);
+        }
+    }
 
     /**
      * Maps each element of this stream to a separate stream, and then flattens the result to one single stream
@@ -222,6 +216,7 @@ public abstract class Stream<E> implements Iterable<E> {
             throw new IllegalArgumentException("Unable to join this stream because the provided delimiter is null");
         return this.reduce(new Reducer<E, StringBuilder>() {
             private boolean isFirstElement = true;
+
             @Override
             public StringBuilder reduce(StringBuilder s, E e) {
                 return ((isFirstElement && !(isFirstElement = false) ? s : s.append(delimiter))).append(String.valueOf(e));
@@ -426,8 +421,9 @@ public abstract class Stream<E> implements Iterable<E> {
      * Creates a {@link Map} from this stream.
      * Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained.
      * If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+     *
      * @param keyMapper the mapper function that computes a key for each element
-     * @param <K> the type of the key for each entry in the map
+     * @param <K>       the type of the key for each entry in the map
      * @return a new map containing entries for each element (that had a unique key)
      */
     public <K> Map<K, E> toMap(final Mapper<E, K> keyMapper) {
@@ -443,14 +439,15 @@ public abstract class Stream<E> implements Iterable<E> {
      * Creates a {@link Map} from this stream.
      * Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained.
      * If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
-     * @param keyMapper the mapper function that computes a key for each element
+     *
+     * @param keyMapper   the mapper function that computes a key for each element
      * @param valueMapper the mapper function that computes a value for each element
-     * @param <K> the type of the key for each entry in the map
-     * @param <V> the type of the value for each entry in the map
+     * @param <K>         the type of the key for each entry in the map
+     * @param <V>         the type of the value for each entry in the map
      * @return a new map containing entries for each element (that had a unique key)
      */
     public <K, V> Map<K, V> toMap(final Mapper<E, K> keyMapper, final Mapper<E, V> valueMapper) {
-        if(keyMapper == null)
+        if (keyMapper == null)
             throw new IllegalArgumentException("Cannot convert this stream to a Map because the keyMapper is null");
         return this.reduce(new Reducer<E, Map<K, V>>() {
             @Override

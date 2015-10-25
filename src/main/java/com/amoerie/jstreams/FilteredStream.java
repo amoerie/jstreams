@@ -22,7 +22,7 @@ class FilteredStream<E> extends Stream<E> {
             private boolean isNextElementReady;
             private E nextElement;
 
-            private boolean tryEnsureValidElement() {
+            private boolean tryPrepareNextElement() {
                 while (iterator.hasNext() && !isNextElementReady) {
                     E next = iterator.next();
                     if (filter.apply(next)) {
@@ -35,12 +35,12 @@ class FilteredStream<E> extends Stream<E> {
 
             @Override
             public boolean hasNext() {
-                return tryEnsureValidElement();
+                return tryPrepareNextElement();
             }
 
             @Override
             public E next() {
-                if(!tryEnsureValidElement())
+                if(!tryPrepareNextElement())
                     throw new NoSuchElementException();
                 isNextElementReady = false;
                 return nextElement;
