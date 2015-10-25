@@ -31,9 +31,8 @@ import com.amoerie.jstreams.functions.Consumer;
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 
-@RunWith(Enclosed.class)
 public class TestsForStream {
-    private static Mapper<Fruit, String> getFruitName = new Mapper<Fruit, String>() {
+    private static final Mapper<Fruit, String> getFruitName = new Mapper<Fruit, String>() {
         @Override
         public String map(Fruit element) {
             return element.getName();
@@ -467,10 +466,10 @@ public class TestsForStream {
 
 	public static class TestsForForeach {
 		private static class StreamCollector<T> implements Consumer<T> {
-			private List<T> found = new ArrayList<T>();
+			private final List<T> found = new ArrayList<T>();
 
 			@Override
-			public void apply(T e) {
+			public void consume(T e) {
 				found.add(e);
 			}
 
