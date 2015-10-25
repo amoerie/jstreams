@@ -195,9 +195,10 @@ public abstract class Stream<E> implements Iterable<E> {
         if (delimiter == null)
             throw new IllegalArgumentException("Unable to join this stream because the provided delimiter is null");
         return this.reduce(new Reducer<E, StringBuilder>() {
+            private boolean isFirstElement = true;
             @Override
             public StringBuilder reduce(StringBuilder s, E e) {
-                return ( s.length() == 0 ? s : s.append(delimiter) ).append(String.valueOf(e));
+                return ((isFirstElement && !(isFirstElement = false) ? s : s.append(delimiter))).append(String.valueOf(e));
             }
         }, new StringBuilder()).toString();
     }
