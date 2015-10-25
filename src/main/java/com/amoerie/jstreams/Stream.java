@@ -1,7 +1,16 @@
 package com.amoerie.jstreams;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.amoerie.jstreams.functions.Consumer;
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 import com.amoerie.jstreams.functions.Reducer;
@@ -122,7 +131,9 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return a new stream containing all the elements of this stream and the other stream
      */
     public Stream<E> concat(final Stream<E> other) {
-        return new FlatStream<E>(create(new ArrayList<Stream<E>>(2) {{
+		return new FlatStream<E>(create(new ArrayList<Stream<E>>(2) {
+			private static final long serialVersionUID = -24564403429240129L;
+			{
             add(Stream.this);
             add(other);
         }}));
@@ -158,6 +169,21 @@ public abstract class Stream<E> implements Iterable<E> {
         Iterator<E> iterator = iterator();
         return iterator.hasNext() ? iterator.next() : null;
     }
+
+    /**
+	 * Executes given operation on every element of this stream, in the order of
+	 * iteration
+	 * 
+	 * @param consumer
+	 *            the function to be executed on elements of the stream
+	 */
+	public void forEach(Consumer<E> consumer) {
+		if (consumer == null)
+			throw new IllegalArgumentException("Unable to apply forEach because the consumer is null!");
+		for (E e : this) {
+			consumer.apply(e);
+		}
+	}
 
     /**
      * Maps each element of this stream to a separate stream, and then flattens the result to one single stream

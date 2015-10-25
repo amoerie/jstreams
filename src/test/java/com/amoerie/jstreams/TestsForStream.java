@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import com.amoerie.jstreams.TestModels.Apple;
 import com.amoerie.jstreams.TestModels.Fruit;
 import com.amoerie.jstreams.TestModels.FruitBasket;
+import com.amoerie.jstreams.functions.Consumer;
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 
@@ -463,6 +464,38 @@ public class TestsForStream {
             assertThat(allFruits, is(makeFruitBasket(new Fruit("apple"), new Fruit("pear"), new Fruit("strawberries")).asList()));
         }
     }
+
+	public static class TestsForForeach {
+		private static class StreamCollector<T> implements Consumer<T> {
+			private List<T> found = new ArrayList<T>();
+
+			@Override
+			public void apply(T e) {
+				found.add(e);
+			}
+
+			public List<T> getFound() {
+				return Collections.unmodifiableList(found);
+			}
+		}
+
+		private void testCollectionForParams(Object[] params) {
+			StreamCollector<Object> collector = new StreamCollector<Object>();
+			Stream.of(params).forEach(collector);
+			assertThat(collector.getFound(), is(Arrays.asList(params)));
+		}
+
+		@Test
+		public void shouldSupportEmptyStream() {
+			testCollectionForParams(new Object[] {});
+		}
+
+
+		@Test
+		public void shouldPreserveIterationOrder() {
+			testCollectionForParams(new Object[] { "", 5, 3 });
+		}
+	}
 
     public static class TestsForJoin {
 
