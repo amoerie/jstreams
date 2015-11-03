@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/amoerie/jstreams.svg)](https://travis-ci.org/amoerie/jstreams)
 
-Contains Java 6 compatible streams that are immutable, lazy and chainable.
+Contains Java 6 compatible streams that are immutable, lazy and chainable. Create a Stream from any sequence and transform it any way you like. 
 
 - For the C# developers: This library looks A LOT like Linq To Objects, the only difference being that the method names are more conventional ('filter' instead of 'Where', etc.).
 
@@ -16,7 +16,6 @@ For example, you can do the following:
 ```java
       List<String> firstFiveStrings = Stream.create(infiniteStrings).take(5).toList();
 ```
-
 3. Stream operators are chainable, allowing you to do complex things with simple compositions.
 
 ## Why did you make this, I thought Java had streams now?
@@ -27,6 +26,48 @@ The reasons I created this are:
 - Other libraries that attempt this sort of thing are either outdated, not well documented or are very bloated.
 
 This library is explicitly called JStreams to accentuate how it's mostly the same thing as Java 8 streams. If you can use JDK 8, you probably should not use this.
+
+## List of operators
+
+### Static operators
+
+- [`Stream.create(E... elements)`](#public-static-e-streame-createfinal-e-elements)
+- [`Stream.create(Iterable<E> elements)`](#public-static-e-streame-createfinal-iterablee-elements)
+- [`Stream.empty()`](#public-static-e-streame-empty)
+- [`Stream.of(E... elements)`](#public-static-e-streame-offinal-e-elements)
+- [`Stream.of(Iterable<E> elements)`](#public-static-e-streame-ofiterablee-elements)
+- [`Stream.singleton(E element)`](#public-static-e-streame-singletonfinal-e-element)
+
+### Instance operators
+
+- [`any()`](#public-boolean-anyfinal-filtere-filter)
+- [`cast(Class<C> clazz)`](#public-c-streamc-castfinal-classc-clazz)
+- [`concat(Stream<E> other)`](#suppresswarningsunchecked-public-streame-concatfinal-streame-other)
+- [`defaultIfEmpty(E defaultElement)`](#public-streame-defaultifemptyfinal-e-defaultelement)
+- [`distinct()`](#public-streame-distinct)
+- [`filter(Filter<E> filter)`](#public-streame-filterfinal-filtere-filter)
+- [`first()`](#public-e-first)
+- [`forEach(Consumer<E> consumer)`](#public-void-foreachfinal-consumere-consumer)
+- [`flatMap(Mapper<E, Stream<R>> mapper)`](#public-r-streamr-flatmapfinal-mappere-streamr-mapper)
+- [`groupBy(Mapper<E, K> keyMapper)`](#public-k-streamgroupk-e-groupbyfinal-mappere-k-keymapper)
+- [`join(String delimiter)`](#public-string-joinfinal-string-delimiter)
+- [`last()`](#public-e-last)
+- [`length()`](#public-int-length)
+- [`limit(int number)`](#public-streame-limitfinal-int-number)
+- [`ofClass(Class<C> clazz)`](#public-c-streamc-ofclassfinal-classc-clazz)
+- [`map(Mapper<E> mapper)`](#public-r-streamr-mapfinal-mappere-r-mapper)
+- [`reduce(Reducer<E, R> reducer, R initialValue)`](#public-r-r-reducefinal-reducere-r-reducer-final-r-initialvalue)
+- [`skip(int number)`](#public-streame-skipfinal-int-number)
+- [`some(Filter<E> filter)`](#public-boolean-somefinal-filtere-filter)
+- [`sort(Comparator<E> comparator)`](#public-streame-sortfinal-comparatore-comparator)
+- [`sortBy(Mapper<E, T> mapper)`](#public-t-extends-comparablet-streame-sortbyfinal-mappere-t-mapper)
+- [`sortByDescending(Mapper<E, T> mapper)`](#public-t-extends-comparablet-streame-sortbydescendingfinal-mappere-t-mapper)
+- [`take(int number)()`](#public-streame-takefinal-int-number)
+- [`toList()`](#public-liste-tolist)
+- [`toMap(Mapper<E, K> keyMapper)`](#public-k-mapk-e-tomapfinal-mappere-k-keymapper)
+- [`toMap(Mapper<E, K> keyMapper, Mapper<E, V> valueMapper)`](#public-k-v-mapk-v-tomapfinal-mappere-k-keymapper-final-mappere-v-valuemapper)
+- [`toSet()`](#public-sete-toset)
+- [`without(Stream<E> other)`](#public-streame-withoutfinal-streame-other)
 
 ## How do I use this
 
