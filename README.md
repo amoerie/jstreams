@@ -1,4 +1,4 @@
-# JStreams 1.0
+# JStreams 1.1
 
 [![Build Status](https://travis-ci.org/amoerie/jstreams.svg)](https://travis-ci.org/amoerie/jstreams)
 
