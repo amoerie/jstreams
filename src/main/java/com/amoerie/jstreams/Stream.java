@@ -136,6 +136,15 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Adds a default element to this stream if and only if it is empty
+     * @param defaultElement the default element to use when the stream is empty
+     * @return a new stream containing either all the elements of the current stream or a singleton stream with only the default element
+     */
+    public Stream<E> defaultIfEmpty(final E defaultElement) {
+        return new DefaultIfEmptyStream<E>(this, defaultElement);
+    }
+
+    /**
      * Filters this stream to only have unique elements.
      *
      * @return a new stream containing only unique elements.
@@ -162,7 +171,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return the first element of this stream or null if the stream is empty
      */
     public E first() {
-        Iterator<E> iterator = iterator();
+        final Iterator<E> iterator = iterator();
         return iterator.hasNext() ? iterator.next() : null;
     }
 
@@ -171,7 +180,7 @@ public abstract class Stream<E> implements Iterable<E> {
      *
      * @param consumer the function to be executed for each element of the stream
      */
-    public void forEach(Consumer<E> consumer) {
+    public void forEach(final Consumer<E> consumer) {
         if (consumer == null)
             throw new IllegalArgumentException("Unable to apply forEach because the consumer is null!");
         for (E e : this) {
@@ -218,8 +227,8 @@ public abstract class Stream<E> implements Iterable<E> {
             private boolean isFirstElement = true;
 
             @Override
-            public StringBuilder reduce(StringBuilder s, E e) {
-                return ((isFirstElement && !(isFirstElement = false) ? s : s.append(delimiter))).append(String.valueOf(e));
+            public StringBuilder reduce(final StringBuilder s, final E e) {
+                return (isFirstElement && !(isFirstElement = false) ? s : s.append(delimiter)).append(String.valueOf(e));
             }
         }, new StringBuilder()).toString();
     }

@@ -214,6 +214,30 @@ public class TestsForStream {
 
     }
 
+    public static class TestsForDefaultIfEmpty {
+
+        @Test
+        public void shouldUseTheDefaultElementIfTheStreamIsEmpty() {
+            assertThat(Stream.<String>empty().defaultIfEmpty("abc").toSet(), is(Collections.singleton("abc")));
+        }
+
+        @Test
+        public void shouldNotUseTheDefaultElementIfTheStreamIsNotEmpty() {
+            assertThat(Stream.create("apple", "banana").defaultIfEmpty("pear").toList(), is(Arrays.asList("apple", "banana")));
+        }
+
+        @Test
+        public void shouldCorrectlyDistinctFromAnInfiniteStream() {
+            Stream<String> infiniteFruits = Stream.create(Arrays.asList("Pear", "Apple"))
+                    .concat(new InfiniteStream<String>("Grape"))
+                    .defaultIfEmpty("Mango");
+            List<String> firstFourFruits = infiniteFruits.take(4).toList();
+            List<String> expectedFruits = Arrays.asList("Pear", "Apple", "Grape", "Grape");
+            assertThat(firstFourFruits, is(expectedFruits));
+        }
+
+    }
+
     public static class TestsForDistinct {
 
         @Test
