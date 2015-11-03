@@ -50,7 +50,7 @@ Or you can just download the latest jar file from [the releases page](https://gi
 
 ## Roadmap
 
-- 1.1 will be released end of October 2015, fixing a few bugs, adding a couple of operators such as `distinct`, `toMap` and adding some aliases.
+- 1.1 will be released beginning of November 2015, fixing a few bugs, adding a couple of operators such as `distinct`, `toMap` and adding some aliases.
 
 ## Pull requests
 
