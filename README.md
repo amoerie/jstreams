@@ -1,6 +1,7 @@
 # JStreams 1.1
 
 [![Build Status](https://travis-ci.org/amoerie/jstreams.svg)](https://travis-ci.org/amoerie/jstreams)
+[![Download](https://api.bintray.com/packages/bintray/jcenter/com.amoerie%3Ajstreams/images/download.svg) ](https://bintray.com/bintray/jcenter/com.amoerie%3Ajstreams/_latestVersion)
 
 Contains Java 6 compatible streams that are immutable, lazy and chainable. Create a Stream from any sequence and transform it any way you like. 
 
