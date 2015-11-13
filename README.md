@@ -62,7 +62,7 @@ This library is explicitly called JStreams to accentuate how it's mostly the sam
 - [`sort(Comparator<E> comparator)`](#public-streame-sortfinal-comparatore-comparator)
 - [`sortBy(Mapper<E, T> mapper)`](#public-t-extends-comparablet-streame-sortbyfinal-mappere-t-mapper)
 - [`sortByDescending(Mapper<E, T> mapper)`](#public-t-extends-comparablet-streame-sortbydescendingfinal-mappere-t-mapper)
-- [`take(int number)()`](#public-streame-takefinal-int-number)
+- [`take(int number)`](#public-streame-takefinal-int-number)
 - [`toList()`](#public-liste-tolist)
 - [`toMap(Mapper<E, K> keyMapper)`](#public-k-mapk-e-tomapfinal-mappere-k-keymapper)
 - [`toMap(Mapper<E, K> keyMapper, Mapper<E, V> valueMapper)`](#public-k-v-mapk-v-tomapfinal-mappere-k-keymapper-final-mappere-v-valuemapper)
@@ -77,14 +77,14 @@ You can use Maven! Add this to your `<dependencies>` in your pom.xml:
       <dependency>
             <groupId>com.amoerie</groupId>
             <artifactId>jstreams</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
       </dependency>
 ```
 
 Or if you use Gradle, add this to your `build.gradle` file 
 
 ```groovy
-    compile 'com.amoerie:jstreams:1.0'
+    compile 'com.amoerie:jstreams:1.1'
 ```
 
 Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
