@@ -1,10 +1,19 @@
 package com.amoerie.jstreams;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.amoerie.jstreams.functions.Consumer;
 import com.amoerie.jstreams.functions.Filter;
 import com.amoerie.jstreams.functions.Mapper;
 import com.amoerie.jstreams.functions.Reducer;
-
-import java.util.*;
 
 /**
  * Represents a collection of elements that are not known at construction time
@@ -18,6 +27,35 @@ public abstract class Stream<E> implements Iterable<E> {
     protected Stream() {
     }
 
+    /* static methods (alphabetically) */
+
+    /**
+     * Creates a new stream from the provided array of elements
+     *
+     * @param elements the array of elements
+     * @param <E>      the type of the elements
+     * @return a new stream containing the elements of the array
+     */
+    public static <E> Stream<E> create(final E... elements) {
+        if (elements == null)
+            throw new IllegalArgumentException("Unable to create a stream from this array because it is null!");
+        return create(Arrays.asList(elements));
+    }
+
+    /**
+     * Creates a new stream from the provided iterable
+     * This is a lazy operation, it does not consume the iterable until a greedy operation is called, such as toList()
+     *
+     * @param elements an iterable containing elements
+     * @param <E>      the type of an element
+     * @return a new stream containing the elements of the iterable
+     */
+    public static <E> Stream<E> create(final Iterable<E> elements) {
+        if (elements == null)
+            throw new IllegalArgumentException("Unable to create a stream from this iterable because it is null!");
+        return new IterableStream<E>(elements);
+    }
+
     /**
      * Creates a new empty stream, containing no elements
      *
@@ -26,6 +64,28 @@ public abstract class Stream<E> implements Iterable<E> {
      */
     public static <E> Stream<E> empty() {
         return new EmptyStream<E>();
+    }
+
+    /**
+     * Alias for {@link #create(Object[])}
+     *
+     * @param elements the array of elements
+     * @param <E>      the type of the elements
+     * @return a new stream containing the elements of the array
+     */
+    public static <E> Stream<E> of(final E... elements) {
+        return create(elements);
+    }
+
+    /**
+     * Alias for {@link #create(Iterable)}
+     *
+     * @param elements an iterable containing elements
+     * @param <E>      the type of an element
+     * @return a new stream containing the elements of the iterable
+     */
+    public static <E> Stream<E> of(Iterable<E> elements) {
+        return create(elements);
     }
 
     /**
@@ -39,31 +99,16 @@ public abstract class Stream<E> implements Iterable<E> {
         return new SingletonStream<E>(element);
     }
 
-    /**
-     * Creates a new stream from the provided array of elements
-     *
-     * @param array the array of elements
-     * @param <E>   the type of the elements
-     * @return a new stream containing the elements of the array
-     */
-    public static <E> Stream<E> create(final E[] array) {
-        if (array == null)
-            throw new IllegalArgumentException("Unable to create a stream from this array because it is null!");
-        return create(Arrays.asList(array));
-    }
+    /* Instance methods (alphabetically) */
 
     /**
-     * Creates a new stream from the provided iterable
-     * This is a lazy operation, it does not consume the iterable until a greedy operation is called, such as toList()
+     * Alias for {@link #some(Filter)}
      *
-     * @param iterable an iterable containing elements
-     * @param <E>      the type of an element
-     * @return a new stream containing the elements of the iterable
+     * @param filter the filter that returns true or false for any given element
+     * @return true if one of the elements satisfied the predicate or false otherwise
      */
-    public static <E> Stream<E> create(final Iterable<E> iterable) {
-        if(iterable == null)
-            throw new IllegalArgumentException("Unable to create a stream from this iterable because it is null!");
-        return new IterableStream<E>(iterable);
+    public boolean any(final Filter<E> filter) {
+        return some(filter);
     }
 
     /**
@@ -85,12 +130,23 @@ public abstract class Stream<E> implements Iterable<E> {
      * @param other the other stream to concatenate with
      * @return a new stream containing all the elements of this stream and the other stream
      */
+    @SuppressWarnings("unchecked")
     public Stream<E> concat(final Stream<E> other) {
-        return new FlatStream<E>(create(Arrays.asList(this, other)));
+        return new FlatStream<E>(create(Stream.this, other));
+    }
+
+    /**
+     * Adds a default element to this stream if and only if it is empty
+     * @param defaultElement the default element to use when the stream is empty
+     * @return a new stream containing either all the elements of the current stream or a singleton stream with only the default element
+     */
+    public Stream<E> defaultIfEmpty(final E defaultElement) {
+        return new DefaultIfEmptyStream<E>(this, defaultElement);
     }
 
     /**
      * Filters this stream to only have unique elements.
+     *
      * @return a new stream containing only unique elements.
      */
     public Stream<E> distinct() {
@@ -115,8 +171,21 @@ public abstract class Stream<E> implements Iterable<E> {
      * @return the first element of this stream or null if the stream is empty
      */
     public E first() {
-        Iterator<E> iterator = iterator();
+        final Iterator<E> iterator = iterator();
         return iterator.hasNext() ? iterator.next() : null;
+    }
+
+    /**
+     * Iterates over all the elements of this stream and feeds them one by one to the provided {@code consumer}
+     *
+     * @param consumer the function to be executed for each element of the stream
+     */
+    public void forEach(final Consumer<E> consumer) {
+        if (consumer == null)
+            throw new IllegalArgumentException("Unable to apply forEach because the consumer is null!");
+        for (E e : this) {
+            consumer.consume(e);
+        }
     }
 
     /**
@@ -136,13 +205,32 @@ public abstract class Stream<E> implements Iterable<E> {
      * Groups this stream into chunks based on the key per element that is retrieved via the keySelector
      *
      * @param keyMapper a function that returns the grouping key for a given element
-     * @param <K>         the type of the key
+     * @param <K>       the type of the key
      * @return a stream containing groups as its elements
      */
     public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper) {
         if (keyMapper == null)
             throw new IllegalArgumentException("Unable to group this stream because the keyMapper is null!");
         return new GroupedStream<K, E>(this, keyMapper);
+    }
+
+    /**
+     * Joins the stream using the given delimiter
+     *
+     * @param delimiter the delimiter to be inserted between each element
+     * @return a string containing all of the elements with the given delimiter between each element
+     */
+    public String join(final String delimiter) {
+        if (delimiter == null)
+            throw new IllegalArgumentException("Unable to join this stream because the provided delimiter is null");
+        return this.reduce(new Reducer<E, StringBuilder>() {
+            private boolean isFirstElement = true;
+
+            @Override
+            public StringBuilder reduce(final StringBuilder s, final E e) {
+                return (isFirstElement && !(isFirstElement = false) ? s : s.append(delimiter)).append(String.valueOf(e));
+            }
+        }, new StringBuilder()).toString();
     }
 
     /**
@@ -169,6 +257,16 @@ public abstract class Stream<E> implements Iterable<E> {
                 return length + 1;
             }
         }, 0);
+    }
+
+    /**
+     * Alias for {@link #take(int)}
+     *
+     * @param number the number of items to take
+     * @return a new stream containing only the first n elements of this stream
+     */
+    public Stream<E> limit(final int number) {
+        return take(number);
     }
 
     /**
@@ -204,10 +302,18 @@ public abstract class Stream<E> implements Iterable<E> {
      * Reduces this stream to a single value by repeatedly applying the same reduction operator to the
      * current value and the next element.
      * For example, to reduce a stream of integers to a sum:
-     * numbers.reduce((sum, number) => sum + number, 0)
+     * <pre>
+     * {@code int sum = numbers.reduce(new Reducer<Integer, Integer>() {
+     *          public Integer reduce(Integer sum, Integer number) {
+     *              return sum + number;
+     *          }
+     *     }, 0)
+     * }
+     * </pre>
      *
-     * @param reducer the reduction function that turns the current value and the next element into the next value
-     * @param <R>     the type of the result of the reduced stream
+     * @param reducer      the reduction function that turns the current value and the next element into the next value
+     * @param initialValue the initial value to start from. This is also the value that will be returned when the stream is empty.
+     * @param <R>          the type of the result of the reduced stream
      * @return the final value after reducing every element
      */
     public <R> R reduce(final Reducer<E, R> reducer, final R initialValue) {
@@ -234,13 +340,14 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Determines whether any of the elements in this stream satisfy the given predicate
+     *
      * @param filter the filter that returns true or false for any given element
      * @return true if one of the elements satisfied the predicate or false otherwise
      */
     public boolean some(final Filter<E> filter) {
-        if(filter == null)
+        if (filter == null)
             throw new IllegalArgumentException("Unable to determine if some element satisfies this filter because the filter is null!");
-        return this.filter(filter).first() != null;
+        return this.filter(filter).iterator().hasNext();
     }
 
     /**
@@ -260,7 +367,7 @@ public abstract class Stream<E> implements Iterable<E> {
      * Sorts this stream based on a property of each element, provided that that property implements Comparable.
      *
      * @param mapper the function that extracts a value from an element so it can be used as the basis for the comparison
-     * @param <T>              the type of the property that is the basis for the comparison
+     * @param <T>    the type of the property that is the basis for the comparison
      * @return a new stream containing all elements of this stream sorted by the given property
      */
     public <T extends Comparable<T>> Stream<E> sortBy(final Mapper<E, T> mapper) {
@@ -276,8 +383,9 @@ public abstract class Stream<E> implements Iterable<E> {
 
     /**
      * Sorts this stream descendingly based on a mapped value of each element, provided that that value implements Comparable.
+     *
      * @param mapper the function that extracts a value from an element so it can be used as the basis for the comparison
-     * @param <T>              the type of the property that is the basis for the comparison
+     * @param <T>    the type of the property that is the basis for the comparison
      * @return a new stream containing all elements of this stream sorted by the given property
      */
     public <T extends Comparable<T>> Stream<E> sortByDescending(final Mapper<E, T> mapper) {
@@ -319,6 +427,47 @@ public abstract class Stream<E> implements Iterable<E> {
     }
 
     /**
+     * Creates a {@link Map} from this stream.
+     * Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained.
+     * If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+     *
+     * @param keyMapper the mapper function that computes a key for each element
+     * @param <K>       the type of the key for each entry in the map
+     * @return a new map containing entries for each element (that had a unique key)
+     */
+    public <K> Map<K, E> toMap(final Mapper<E, K> keyMapper) {
+        return toMap(keyMapper, new Mapper<E, E>() {
+            @Override
+            public E map(E e) {
+                return e;
+            }
+        });
+    }
+
+    /**
+     * Creates a {@link Map} from this stream.
+     * Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained.
+     * If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+     *
+     * @param keyMapper   the mapper function that computes a key for each element
+     * @param valueMapper the mapper function that computes a value for each element
+     * @param <K>         the type of the key for each entry in the map
+     * @param <V>         the type of the value for each entry in the map
+     * @return a new map containing entries for each element (that had a unique key)
+     */
+    public <K, V> Map<K, V> toMap(final Mapper<E, K> keyMapper, final Mapper<E, V> valueMapper) {
+        if (keyMapper == null)
+            throw new IllegalArgumentException("Cannot convert this stream to a Map because the keyMapper is null");
+        return this.reduce(new Reducer<E, Map<K, V>>() {
+            @Override
+            public Map<K, V> reduce(Map<K, V> map, E e) {
+                map.put(keyMapper.map(e), valueMapper.map(e));
+                return map;
+            }
+        }, new HashMap<K, V>());
+    }
+
+    /**
      * Turns this stream into a set
      *
      * @return a new set containing the elements of this stream
@@ -336,11 +485,12 @@ public abstract class Stream<E> implements Iterable<E> {
     /**
      * Filters out elements from this stream based on the elements from another.
      * Only elements that are NOT in the other stream are allowed to pass through.
+     *
      * @param other the stream containing elements that are forbidden to pass through
      * @return a new stream containing only elements that cannot be found in the other stream
      */
     public Stream<E> without(final Stream<E> other) {
-        if(other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
+        if (other == null) throw new IllegalArgumentException("The argument 'other' cannot be null!");
         return new WithoutStream<E>(this, other);
     }
 }

@@ -18,32 +18,32 @@ class FilteredStream<E> extends Stream<E> {
     public Iterator<E> iterator() {
         final Iterator<E> iterator = stream.iterator();
         return new Iterator<E>() {
-            private boolean isNextFilteredElementReady;
-            private E nextFilteredElement;
 
-            private void prepareNextFilteredElement() {
-                isNextFilteredElementReady = false;
-                while (iterator.hasNext() && !isNextFilteredElementReady) {
+            private boolean isNextElementReady;
+            private E nextElement;
+
+            private boolean tryPrepareNextElement() {
+                while (iterator.hasNext() && !isNextElementReady) {
                     E next = iterator.next();
                     if (filter.apply(next)) {
-                        nextFilteredElement = next;
-                        isNextFilteredElementReady = true;
+                        nextElement = next;
+                        return isNextElementReady = true;
                     }
                 }
+                return isNextElementReady;
             }
 
             @Override
             public boolean hasNext() {
-                if (!isNextFilteredElementReady) prepareNextFilteredElement();
-                return isNextFilteredElementReady;
+                return tryPrepareNextElement();
             }
 
             @Override
             public E next() {
-                if (!isNextFilteredElementReady) prepareNextFilteredElement();
-                if (!isNextFilteredElementReady) throw new NoSuchElementException();
-                isNextFilteredElementReady = false;
-                return nextFilteredElement;
+                if(!tryPrepareNextElement())
+                    throw new NoSuchElementException();
+                isNextElementReady = false;
+                return nextElement;
             }
 
             @Override

@@ -5,9 +5,9 @@ import java.util.NoSuchElementException;
 
 class FlatStream<E> extends Stream<E> {
 
-    private Stream<Stream<E>> streams;
+    private final Stream<Stream<E>> streams;
 
-    public FlatStream(Stream<Stream<E>> streams) {
+    public FlatStream(final Stream<Stream<E>> streams) {
         this.streams = streams;
     }
 

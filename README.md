@@ -1,8 +1,9 @@
-# JStreams
+# JStreams 1.1
 
 [![Build Status](https://travis-ci.org/amoerie/jstreams.svg)](https://travis-ci.org/amoerie/jstreams)
+[![Download](https://api.bintray.com/packages/bintray/jcenter/com.amoerie%3Ajstreams/images/download.svg) ](https://bintray.com/bintray/jcenter/com.amoerie%3Ajstreams/_latestVersion)
 
-Contains Java 6 compatible streams that are immutable, lazy and chainable.
+Contains Java 6 compatible streams that are immutable, lazy and chainable. Create a Stream from any sequence and transform it any way you like. 
 
 - For the C# developers: This library looks A LOT like Linq To Objects, the only difference being that the method names are more conventional ('filter' instead of 'Where', etc.).
 
@@ -16,7 +17,6 @@ For example, you can do the following:
 ```java
       List<String> firstFiveStrings = Stream.create(infiniteStrings).take(5).toList();
 ```
-
 3. Stream operators are chainable, allowing you to do complex things with simple compositions.
 
 ## Why did you make this, I thought Java had streams now?
@@ -28,6 +28,48 @@ The reasons I created this are:
 
 This library is explicitly called JStreams to accentuate how it's mostly the same thing as Java 8 streams. If you can use JDK 8, you probably should not use this.
 
+## List of operators
+
+### Static operators
+
+- [`Stream.create(E... elements)`](#public-static-e-streame-createfinal-e-elements)
+- [`Stream.create(Iterable<E> elements)`](#public-static-e-streame-createfinal-iterablee-elements)
+- [`Stream.empty()`](#public-static-e-streame-empty)
+- [`Stream.of(E... elements)`](#public-static-e-streame-offinal-e-elements)
+- [`Stream.of(Iterable<E> elements)`](#public-static-e-streame-ofiterablee-elements)
+- [`Stream.singleton(E element)`](#public-static-e-streame-singletonfinal-e-element)
+
+### Instance operators
+
+- [`any()`](#public-boolean-anyfinal-filtere-filter)
+- [`cast(Class<C> clazz)`](#public-c-streamc-castfinal-classc-clazz)
+- [`concat(Stream<E> other)`](#suppresswarningsunchecked-public-streame-concatfinal-streame-other)
+- [`defaultIfEmpty(E defaultElement)`](#public-streame-defaultifemptyfinal-e-defaultelement)
+- [`distinct()`](#public-streame-distinct)
+- [`filter(Filter<E> filter)`](#public-streame-filterfinal-filtere-filter)
+- [`first()`](#public-e-first)
+- [`forEach(Consumer<E> consumer)`](#public-void-foreachfinal-consumere-consumer)
+- [`flatMap(Mapper<E, Stream<R>> mapper)`](#public-r-streamr-flatmapfinal-mappere-streamr-mapper)
+- [`groupBy(Mapper<E, K> keyMapper)`](#public-k-streamgroupk-e-groupbyfinal-mappere-k-keymapper)
+- [`join(String delimiter)`](#public-string-joinfinal-string-delimiter)
+- [`last()`](#public-e-last)
+- [`length()`](#public-int-length)
+- [`limit(int number)`](#public-streame-limitfinal-int-number)
+- [`ofClass(Class<C> clazz)`](#public-c-streamc-ofclassfinal-classc-clazz)
+- [`map(Mapper<E> mapper)`](#public-r-streamr-mapfinal-mappere-r-mapper)
+- [`reduce(Reducer<E, R> reducer, R initialValue)`](#public-r-r-reducefinal-reducere-r-reducer-final-r-initialvalue)
+- [`skip(int number)`](#public-streame-skipfinal-int-number)
+- [`some(Filter<E> filter)`](#public-boolean-somefinal-filtere-filter)
+- [`sort(Comparator<E> comparator)`](#public-streame-sortfinal-comparatore-comparator)
+- [`sortBy(Mapper<E, T> mapper)`](#public-t-extends-comparablet-streame-sortbyfinal-mappere-t-mapper)
+- [`sortByDescending(Mapper<E, T> mapper)`](#public-t-extends-comparablet-streame-sortbydescendingfinal-mappere-t-mapper)
+- [`take(int number)`](#public-streame-takefinal-int-number)
+- [`toList()`](#public-liste-tolist)
+- [`toMap(Mapper<E, K> keyMapper)`](#public-k-mapk-e-tomapfinal-mappere-k-keymapper)
+- [`toMap(Mapper<E, K> keyMapper, Mapper<E, V> valueMapper)`](#public-k-v-mapk-v-tomapfinal-mappere-k-keymapper-final-mappere-v-valuemapper)
+- [`toSet()`](#public-sete-toset)
+- [`without(Stream<E> other)`](#public-streame-withoutfinal-streame-other)
+
 ## How do I use this
 
 You can use Maven! Add this to your `<dependencies>` in your pom.xml:
@@ -36,17 +78,21 @@ You can use Maven! Add this to your `<dependencies>` in your pom.xml:
       <dependency>
             <groupId>com.amoerie</groupId>
             <artifactId>jstreams</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
       </dependency>
 ```
 
 Or if you use Gradle, add this to your `build.gradle` file 
 
 ```groovy
-    compile 'com.amoerie:jstreams:1.0'
+    compile 'com.amoerie:jstreams:1.1'
 ```
 
 Or you can just download the latest jar file from [the releases page](https://github.com/amoerie/jstreams/releases)!
+
+## Roadmap
+
+- 1.1 will be released beginning of November 2015, fixing a few bugs, adding a couple of operators such as `distinct`, `toMap` and adding some aliases.
 
 ## Pull requests
 
@@ -73,13 +119,29 @@ Other tips:
 
 ## Documentation
 
-See the full Java documentation here: http://amoerie.github.io/jstreams/
-
 ### `public abstract class Stream<E> implements Iterable<E>`
 
 Represents a collection of elements that are not known at construction time This is a wrapper around the Iterator class, providing more functional methods than is standard provided by Java, by combining some classic functional paradigms such as map and flatMap.
 
  * **Parameters:** `<E>` — the type of each element in the stream
+
+### `public static <E> Stream<E> create(final E... elements)`
+
+Creates a new stream from the provided array of elements
+
+ * **Parameters:**
+   * `elements` — the array of elements
+   * `<E>` — the type of the elements
+ * **Returns:** a new stream containing the elements of the array
+
+### `public static <E> Stream<E> create(final Iterable<E> elements)`
+
+Creates a new stream from the provided iterable This is a lazy operation, it does not consume the iterable until a greedy operation is called, such as toList()
+
+ * **Parameters:**
+   * `elements` — an iterable containing elements
+   * `<E>` — the type of an element
+ * **Returns:** a new stream containing the elements of the iterable
 
 ### `public static <E> Stream<E> empty()`
 
@@ -87,6 +149,24 @@ Creates a new empty stream, containing no elements
 
  * **Parameters:** `<E>` — the type of the elements of this stream
  * **Returns:** a new empty stream containing no elements
+
+### `public static <E> Stream<E> of(final E... elements)`
+
+Alias for {@link #create(Object[])}
+
+ * **Parameters:**
+   * `elements` — the array of elements
+   * `<E>` — the type of the elements
+ * **Returns:** a new stream containing the elements of the array
+
+### `public static <E> Stream<E> of(Iterable<E> elements)`
+
+Alias for {@link #create(Iterable)}
+
+ * **Parameters:**
+   * `elements` — an iterable containing elements
+   * `<E>` — the type of an element
+ * **Returns:** a new stream containing the elements of the iterable
 
 ### `public static <E> Stream<E> singleton(final E element)`
 
@@ -97,23 +177,12 @@ Creates a new singleton stream, containing exactly one element
    * `<E>` — the type of the single element
  * **Returns:** a new stream containing exactly one element
 
-### `public static <E> Stream<E> create(final E[] array)`
+### `public boolean any(final Filter<E> filter)`
 
-Creates a new stream from the provided array of elements
+Alias for {@link #some(Filter)}
 
- * **Parameters:**
-   * `array` — the array of elements
-   * `<E>` — the type of the elements
- * **Returns:** a new stream containing the elements of the array
-
-### `public static <E> Stream<E> create(final Iterable<E> iterable)`
-
-Creates a new stream from the provided iterable This is a lazy operation, it does not consume the iterable until a consuming operation is called, such as toList()
-
- * **Parameters:**
-   * `iterable` — an iterable containing elements
-   * `<E>` — the type of an element
- * **Returns:** a new stream containing the elements of the iterable
+ * **Parameters:** `filter` — the filter that returns true or false for any given element
+ * **Returns:** true if one of the elements satisfied the predicate or false otherwise
 
 ### `public <C> Stream<C> cast(final Class<C> clazz)`
 
@@ -124,12 +193,25 @@ Casts every element of this stream to another class
    * `<C>` — the type of the class to cast to
  * **Returns:** a new stream containing every element casted to another class
 
-### `public Stream<E> concat(final Stream<E> other)`
+### `@SuppressWarnings("unchecked") public Stream<E> concat(final Stream<E> other)`
 
 Concatenates this stream with another stream
 
  * **Parameters:** `other` — the other stream to concatenate with
  * **Returns:** a new stream containing all the elements of this stream and the other stream
+
+### `public Stream<E> defaultIfEmpty(final E defaultElement)`
+
+Adds a default element to this stream if and only if it is empty
+
+ * **Parameters:** `defaultElement` — the default element to use when the stream is empty
+ * **Returns:** a new stream containing either all the elements of the current stream or a singleton stream with only the default element
+
+### `public Stream<E> distinct()`
+
+Filters this stream to only have unique elements.
+
+ * **Returns:** a new stream containing only unique elements.
 
 ### `public Stream<E> filter(final Filter<E> filter)`
 
@@ -144,6 +226,12 @@ Gets the first element of this stream
 
  * **Returns:** the first element of this stream or null if the stream is empty
 
+### `public void forEach(final Consumer<E> consumer)`
+
+Iterates over all the elements of this stream and feeds them one by one to the provided {@code consumer}
+
+ * **Parameters:** `consumer` — the function to be executed for each element of the stream
+
 ### `public <R> Stream<R> flatMap(final Mapper<E, Stream<R>> mapper)`
 
 Maps each element of this stream to a separate stream, and then flattens the result to one single stream
@@ -152,6 +240,22 @@ Maps each element of this stream to a separate stream, and then flattens the res
    * `mapper` — the function that turns one element into a stream of values
    * `<R>` — the type of one mapped element
  * **Returns:** a new stream containing all elements of all the jstreams the mapper function created
+
+### `public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper)`
+
+Groups this stream into chunks based on the key per element that is retrieved via the keySelector
+
+ * **Parameters:**
+   * `keyMapper` — a function that returns the grouping key for a given element
+   * `<K>` — the type of the key
+ * **Returns:** a stream containing groups as its elements
+
+### `public String join(final String delimiter)`
+
+Joins the stream using the given delimiter
+
+ * **Parameters:** `delimiter` — the delimiter to be inserted between each element
+ * **Returns:** a string containing all of the elements with the given delimiter between each element
 
 ### `public E last()`
 
@@ -164,6 +268,13 @@ Gets the last element of this stream
 Calculates the amount of elements in this stream
 
  * **Returns:** the length of this stream
+
+### `public Stream<E> limit(final int number)`
+
+Alias for {@link #take(int)}
+
+ * **Parameters:** `number` — the number of items to take
+ * **Returns:** a new stream containing only the first n elements of this stream
 
 ### `public <C> Stream<C> ofClass(final Class<C> clazz)`
 
@@ -185,10 +296,11 @@ Maps each element of this stream to another value
 
 ### `public <R> R reduce(final Reducer<E, R> reducer, final R initialValue)`
 
-Reduces this stream to a single value by repeatedly applying the same reduction operator to the current value and the next element. For example, to reduce a stream of integers to a sum: numbers.reduce((sum, number) => sum + number, 0)
+Reduces this stream to a single value by repeatedly applying the same reduction operator to the current value and the next element. For example, to reduce a stream of integers to a sum: <pre> {@code int sum = numbers.reduce(new Reducer<Integer, Integer>() { public Integer reduce(Integer sum, Integer number) { return sum + number; } }, 0) } </pre>
 
  * **Parameters:**
    * `reducer` — the reduction function that turns the current value and the next element into the next value
+   * `initialValue` — the initial value to start from. This is also the value that will be returned when the stream is empty.
    * `<R>` — the type of the result of the reduced stream
  * **Returns:** the final value after reducing every element
 
@@ -238,23 +350,41 @@ Takes a certain number of elements from this stream and drops the remaining elem
  * **Parameters:** `number` — the number of items to take
  * **Returns:** a new stream containing only the first n elements of this stream
 
-### `public <K> Stream<Group<K, E>> groupBy(final Mapper<E, K> keyMapper)`
-
-Groups this stream into chunks based on the key per element that is retrieved via the keySelector
-
- * **Parameters:**
-   * `keyMapper` — a function that returns the grouping key for a given element
-   * `<K>` — the type of the key
- * **Returns:** a stream containing groups as its elements
-
 ### `public List<E> toList()`
 
 Turns this stream into a list
 
  * **Returns:** a new list containing all the elements of this stream
 
+### `public <K> Map<K, E> toMap(final Mapper<E, K> keyMapper)`
+
+Creates a {@link Map} from this stream. Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained. If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+
+ * **Parameters:**
+   * `keyMapper` — the mapper function that computes a key for each element
+   * `<K>` — the type of the key for each entry in the map
+ * **Returns:** a new map containing entries for each element (that had a unique key)
+
+### `public <K, V> Map<K, V> toMap(final Mapper<E, K> keyMapper, final Mapper<E, V> valueMapper)`
+
+Creates a {@link Map} from this stream. Note that the map will only contain one element for each key. If two elements with the same key are encountered, only the last one is retained. If you expect there to be scenarios where a key can be present multiple times, use {@link #groupBy(Mapper)} instead.
+
+ * **Parameters:**
+   * `keyMapper` — the mapper function that computes a key for each element
+   * `valueMapper` — the mapper function that computes a value for each element
+   * `<K>` — the type of the key for each entry in the map
+   * `<V>` — the type of the value for each entry in the map
+ * **Returns:** a new map containing entries for each element (that had a unique key)
+
 ### `public Set<E> toSet()`
 
 Turns this stream into a set
 
  * **Returns:** a new set containing the elements of this stream
+
+### `public Stream<E> without(final Stream<E> other)`
+
+Filters out elements from this stream based on the elements from another. Only elements that are NOT in the other stream are allowed to pass through.
+
+ * **Parameters:** `other` — the stream containing elements that are forbidden to pass through
+ * **Returns:** a new stream containing only elements that cannot be found in the other stream

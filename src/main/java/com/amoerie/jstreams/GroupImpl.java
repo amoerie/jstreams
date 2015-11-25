@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 class GroupImpl<TKey, T> extends Group<TKey, T> {
 
-    private TKey key;
-    private Stream<T> stream;
+    private final TKey key;
+    private final Stream<T> stream;
 
     public GroupImpl(TKey key, Stream<T> stream) {
         this.key = key;

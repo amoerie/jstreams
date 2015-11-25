@@ -6,8 +6,8 @@ import com.amoerie.jstreams.functions.Mapper;
 
 class MappedStream<E, R> extends Stream<R> {
 
-    private Stream<E> stream;
-    private Mapper<E, R> mapper;
+    private final Stream<E> stream;
+    private final Mapper<E, R> mapper;
 
     MappedStream(Stream<E> stream, Mapper<E, R> mapper) {
         this.stream = stream;
